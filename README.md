@@ -31,7 +31,7 @@ Launch the GhettoBlaster server
     $ bin/ghettoblaster
     Listening on port 4438
 
-Open a browser at http://localhost:4438 and enjoy!
+Open a browser at [http://localhost:4438](http://localhost:4438) and enjoy!
 
 License
 -------
