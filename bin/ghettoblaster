@@ -1,0 +1,8 @@
+#!/usr/bin/env node
+
+var GhettoBlasterServer = require("../server");
+var server = new GhettoBlasterServer({root: "/api"});
+
+server.run(4438);
+console.log("Listening on port 4438");
+
