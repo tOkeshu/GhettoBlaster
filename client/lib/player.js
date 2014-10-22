@@ -6,6 +6,7 @@ module("lib/player", function(require) {
     this.playing = false;
     this.audio   = document.createElement("audio");
     this.audio.addEventListener("ended", this._onTrackEnded.bind(this));
+    this.audio.addEventListener("timeupdate", this._onProgress.bind(this));
   }
 
   Player.prototype = {
@@ -35,6 +36,11 @@ module("lib/player", function(require) {
 
     _onTrackEnded: function() {
       this.emit("track:end");
+    },
+
+    _onProgress: function(event) {
+      var progress = event.target.currentTime * 100 / this.audio.duration;
+      this.emit("track:progress", progress);
     }
   };
 

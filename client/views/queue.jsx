@@ -107,6 +107,30 @@ module("views/queue", function(require) {
     }
   });
 
+  var Progress = React.createClass({
+    getInitialState: function() {
+      return {progress: 0};
+    },
+
+    componentDidMount: function() {
+      var changeProgressState = function(progress) {
+        this.setState({progress: progress});
+      }.bind(this);
+
+      this.props.player.on("track:progress", changeProgressState);
+    },
+
+    render: function() {
+      var style = {width: this.state.progress + "%"}
+      return (
+        <div className="progress">
+          <div className="bar" style={style}>
+          </div>
+        </div>
+      );
+    }
+  });
+
   var Queue = React.createClass({
     getInitialState: function() {
       return {tracks: []};
@@ -136,6 +160,7 @@ module("views/queue", function(require) {
               return <Track track={track} player={player} queue={queue}/>;
             }.bind(this))}
           </ul>
+          <Progress player={player}/>
           <Player player={player} queue={queue}/>
         </section>
       );
