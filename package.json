@@ -4,10 +4,13 @@
   "version": "0.0.1",
   "engines": {
     "node": "0.10.x",
-    "npm":"1.4.x"
+    "npm": "1.4.x"
   },
   "dependencies": {
     "express": "3.4.x",
     "smoke-signals": "git://github.com/tOkeshu/smoke-signals.git#master"
+  },
+  "devDependencies": {
+    "gulp-react": "^1.0.2"
   }
 }
