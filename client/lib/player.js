@@ -19,7 +19,7 @@ module("lib/player", function(require) {
 
       this.audio.play();
       this.playing = true;
-      this.emit("playing");
+      this.emit("play");
     },
 
     pause: function() {
@@ -31,7 +31,7 @@ module("lib/player", function(require) {
     stop: function() {
       this.audio.removeAttribute("src");
       this.playing = false;
-      this.emit("stopped");
+      this.emit("stop");
     },
 
     _onTrackEnded: function() {

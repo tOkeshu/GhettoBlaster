@@ -18,7 +18,7 @@ module("views/queue", function(require) {
       }.bind(this);
 
       this.props.player.on("track:change", changePlayingState);
-      this.props.player.on("playing",      changePlayingState);
+      this.props.player.on("play",         changePlayingState);
       this.props.player.on("pause",        changePlayingState);
       this.props.player.on("stop" ,        changePlayingState);
     },
@@ -61,7 +61,7 @@ module("views/queue", function(require) {
       }.bind(this);
 
       this.props.player.on("track:change", changePlayingState);
-      this.props.player.on("playing",      changePlayingState);
+      this.props.player.on("play",         changePlayingState);
       this.props.player.on("pause",        changePlayingState);
       this.props.player.on("stop" ,        changePlayingState);
       this.props.player.on("track:end",    this.next.bind(this));
