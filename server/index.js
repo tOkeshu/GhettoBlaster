@@ -10,6 +10,7 @@ function GhettoBlasterServer(config) {
   this.app.get("/", function(req, res) {
     res.sendfile('/client/index.html', OPTIONS);
   });
+  this.app.use('/test', express.static(__dirname + '/../test'));
 }
 
 inherits(GhettoBlasterServer, SmokeServer);

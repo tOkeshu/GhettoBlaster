@@ -1,4 +1,4 @@
-module("lib/file-list-reader", function(require) {
+define(function(require, exports, module) {
   function FileListReader(files) {
     this.files = files;
   }

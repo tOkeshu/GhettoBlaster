@@ -1,4 +1,4 @@
-module("models/queue", function(require) {
+define(function(require, exports, module) {
   var TrackList = require("models/tracks").TrackList;
 
   function Queue() {

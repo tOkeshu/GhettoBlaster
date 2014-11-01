@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 
-module("views/queue", function(require) {
+define(function(require, exports, module) {
   var Track = React.createClass({
     getInitialState: function() {
       return {playing: this.props.player.playing};

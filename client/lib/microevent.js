@@ -1,4 +1,4 @@
-module("lib/microevent", function() {
+define(function() {
   return MicroEvent;
 });
 

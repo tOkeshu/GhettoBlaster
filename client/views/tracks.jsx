@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 
-module("views/tracks", function(require) {
+define(function(require, exports, module) {
   var MusicTrack     = require("models/tracks").Track;
   var FileListReader = require("lib/file-list-reader");
 

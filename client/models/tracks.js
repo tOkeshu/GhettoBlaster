@@ -1,4 +1,4 @@
-module("models/tracks", function(require) {
+define(function(require, exports, module) {
   var ID3 = require("lib/id3");
 
   function Track(blob) {

@@ -1,4 +1,4 @@
-module("lib/id3", function(require) {
+define(function(require, exports, module) {
   return ID3;
 });
 

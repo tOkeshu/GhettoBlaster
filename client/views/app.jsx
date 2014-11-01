@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 
-module("views/app", function(require) {
+define(function(require, exports, module) {
   var Tracks = require("views/tracks").TrackList;
   var Queue  = require("views/queue").Queue;
 

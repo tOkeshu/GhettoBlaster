@@ -1,4 +1,4 @@
-module("lib/player", function(require) {
+define(function(require, exports, module) {
   var MicroEvent = require("lib/microevent");
 
   function Player() {
