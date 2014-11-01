@@ -1,6 +1,7 @@
 (function() {
   var testFiles = [
-    'test/lib/player_test'
+    'test/lib/player_test',
+    'test/lib/file-list-reader_test'
   ];
 
   require.config({

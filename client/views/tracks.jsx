@@ -6,8 +6,10 @@ define(function(require, exports, module) {
 
   var Importer = React.createClass({
     onFiles: function(event) {
-      var reader = new FileListReader(event.target.files);
-      reader.filterBy('audio/mpeg').forEach(function(file) {
+      var reader = new FileListReader();
+      var files  = event.target.files;
+
+      reader.filter(files).by('audio/mpeg').forEach(function(file) {
         reader.read(file, function(blob) {
           var track = new MusicTrack(blob);
           this.props.tracks.add(track);

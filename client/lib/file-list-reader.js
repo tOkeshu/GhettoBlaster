@@ -1,16 +1,21 @@
 define(function(require, exports, module) {
-  function FileListReader(files) {
-    this.files = files;
+  function FileListReader() {
   }
 
   FileListReader.prototype = {
-    filterBy: function(reg) {
-      var files = [];
-      for (var i = 0; i < this.files.length; i++) {
-        files.push(this.files.item(i));
-      }
+    filter: function(files) {
+      var toFilter = [];
 
-      return files;
+      for (var i = 0; i < files.length; i++)
+        toFilter.push(files[i]);
+
+      return {
+        by: function(reg) {
+          return toFilter.filter(function(file) {
+            return file.type.match(reg);
+          });
+        }
+      };
     },
 
     read: function(file, callback) {
