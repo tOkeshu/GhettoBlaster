@@ -6,36 +6,13 @@ define(function(require, exports, module) {
 
   var App = React.createClass({
     getInitialState: function() {
-      return {currentPanel: 0, queueUpdated: false};
-    },
-
-    componentDidMount: function() {
-      this.props.queue.on("add" , this.onAddedTrack);
-    },
-
-    onAddedTrack: function() {
-      this.getDOMNode().querySelector("header a")
-        .addEventListener("animationend", this.onAnimationEnd);
-      this.setState({
-        currentPanel: this.state.currentPanel,
-        queueUpdated: true
-      });
-    },
-
-    onAnimationEnd: function() {
-      this.getDOMNode().querySelector("header a")
-        .removeEventListener("animationend", this.onAnimationEnd);
-      this.setState({
-        currentPanel: this.state.currentPanel,
-        queueUpdated: false
-      });
+      return {currentPanel: 0};
     },
 
     togglePanel: function(event) {
       event.preventDefault();
       this.setState({
-        currentPanel: (this.state.currentPanel + 1) % 2,
-        queueUpdated: this.state.queueUpdated
+        currentPanel: (this.state.currentPanel + 1) % 2
       });
     },
 
@@ -51,9 +28,7 @@ define(function(require, exports, module) {
         'fa': true,
         'fa-3x': true,
         'fa-play': (this.state.currentPanel == 0),
-        'fa-list': (this.state.currentPanel == 1),
-        'animated': true,
-        'wobble': this.state.queueUpdated
+        'fa-list': (this.state.currentPanel == 1)
       });
       var title = (this.state.currentPanel == 0) ? "Tracks" : "Queue";
 
