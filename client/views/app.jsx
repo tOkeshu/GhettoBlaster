@@ -21,9 +21,6 @@ define(function(require, exports, module) {
     },
 
     render: function() {
-      var player = this.props.player;
-      var queue  = this.props.queue;
-      var tracks = this.props.tracks;
       var className = React.addons.classSet({
         'fa': true,
         'fa-3x': true,
@@ -42,8 +39,8 @@ define(function(require, exports, module) {
             <h1>{title}</h1>
           </header>
           <Panels current={this.current}>
-            <Tracks />
-            <Queue player={player} queue={queue}/>
+            <Tracks/>
+            <Queue/>
           </Panels>
         </section>
       );
