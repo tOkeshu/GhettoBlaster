@@ -1,4 +1,6 @@
 define(function(require, exports, module) {
+  var sha256 = require("lib/hash.js").sha256;
+
   function FileListReader() {
   }
 
@@ -22,7 +24,10 @@ define(function(require, exports, module) {
       var reader = new FileReader();
 
       reader.onload = function(event) {
-        callback(event.target.result)
+        var blob = event.target.result;
+        sha256(blob, function(hash) {
+          callback(blob, hash);
+        });
       };
       reader.readAsArrayBuffer(file);
     }

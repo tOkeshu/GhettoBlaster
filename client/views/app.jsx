@@ -42,7 +42,7 @@ define(function(require, exports, module) {
             <h1>{title}</h1>
           </header>
           <Panels current={this.current}>
-            <Tracks queue={queue} tracks={tracks} player={player}/>
+            <Tracks />
             <Queue player={player} queue={queue}/>
           </Panels>
         </section>

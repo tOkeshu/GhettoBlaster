@@ -1,20 +1,15 @@
 /** @jsx React.DOM */
 
 define(function(require, exports, module) {
-  var MusicTrack     = require("models/tracks").Track;
-  var FileListReader = require("lib/file-list-reader");
+  var stateTree = require("flux/state");
+  var Dispatcher = require("flux/dispatcher");
+  var dispatcherMixin = Dispatcher.mixin(stateTree);
 
   var Importer = React.createClass({
-    onFiles: function(event) {
-      var reader = new FileListReader();
-      var files  = event.target.files;
+    mixins: [dispatcherMixin],
 
-      reader.filter(files).by('audio/mpeg').forEach(function(file) {
-        reader.read(file, function(blob) {
-          var track = new MusicTrack(blob);
-          this.props.tracks.add(track);
-        }.bind(this));
-      }.bind(this));
+    onFiles: function(event) {
+      this.actions.importFiles(event.target.files);
     },
 
     selectFile: function(event) {
@@ -35,8 +30,10 @@ define(function(require, exports, module) {
   });
 
   var Track = React.createClass({
+    mixins: [dispatcherMixin],
+
     addToQueue: function() {
-      this.props.queue.add(this.props.track);
+      this.actions.queue.add(this.props.track);
     },
 
     render: function() {
@@ -51,28 +48,22 @@ define(function(require, exports, module) {
   });
 
   var TrackList = React.createClass({
-    getInitialState: function() {
-      return {tracks: []};
-    },
-
-    componentDidMount: function() {
-      this.props.tracks.on("add" , this.onAddedTrack);
-    },
-
-    onAddedTrack: function(track) {
-      this.setState({tracks: this.props.tracks.slice()});
-    },
+    mixins: [stateTree.mixin],
+    cursor: ["tracks"],
 
     render: function() {
-      var queue = this.props.queue;
-      var className = React.addons.classSet({panel: true, current: this.props.active});
+      var tracks = this.cursor.get().toArray();
+      var className = React.addons.classSet({
+        panel: true,
+        current: this.props.active
+      });
 
       return (
         <section className={className} data-type="list" data-position="left">
           <ul>
-            <Importer tracks={this.props.tracks}/>
-            {this.state.tracks.map(function(track) {
-              return <Track track={track} queue={queue}/>;
+            <Importer/>
+            {tracks.map(function(track) {
+              return <Track track={track}/>;
             }.bind(this))}
           </ul>
         </section>

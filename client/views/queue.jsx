@@ -1,43 +1,34 @@
 /** @jsx React.DOM */
 
 define(function(require, exports, module) {
+  var stateTree = require("flux/state");
+  var Dispatcher = require("flux/dispatcher");
+  var dispatcherMixin = Dispatcher.mixin(stateTree);
+
   var Track = React.createClass({
-    getInitialState: function() {
-      return {playing: this.props.player.playing};
-    },
-
-    componentDidMount: function() {
-      var changePlayingState = function() {
-        var player  = this.props.player;
-        var playing = player.playing;
-
-        if (player.track !== this.props.track)
-          playing = false;
-
-        this.setState({playing: playing});
-      }.bind(this);
-
-      this.props.player.on("track:change", changePlayingState);
-      this.props.player.on("play",         changePlayingState);
-      this.props.player.on("pause",        changePlayingState);
-      this.props.player.on("stop" ,        changePlayingState);
+    mixins: [stateTree.mixin, dispatcherMixin],
+    cursors: {
+      queue: ["queue"],
+      player: ['player']
     },
 
     togglePlay: function() {
-      if (this.state.playing)
-        this.props.player.pause();
-      else {
-        this.props.queue.setTrack(this.props.track);
-        this.props.player.play(this.props.track);
+      if (this.cursors.queue.get('index') === this.props.index) {
+        if (this.cursors.player.get('playing'))
+          this.actions.player.pause();
+        else
+          this.actions.player.play()
+      } else {
+        this.actions.player.play(this.props.index);
       }
     },
 
     render: function() {
-      var player  = this.props.player;
-      var track   = this.props.track;
-      var className = React.addons.classSet({
+      var currentIndex = this.cursors.queue.get('index');
+      var track        = this.props.track;
+      var className    = React.addons.classSet({
         track: true,
-        playing: (track === player.track)
+        playing: (this.props.index === currentIndex)
       });
 
       return (
@@ -51,45 +42,30 @@ define(function(require, exports, module) {
   });
 
   var Player = React.createClass({
-    getInitialState: function() {
-      return {playing: this.props.player.playing};
-    },
-
-    componentDidMount: function() {
-      var changePlayingState = function() {
-        this.setState({playing: this.props.player.playing});
-      }.bind(this);
-
-      this.props.player.on("track:change", changePlayingState);
-      this.props.player.on("play",         changePlayingState);
-      this.props.player.on("pause",        changePlayingState);
-      this.props.player.on("stop" ,        changePlayingState);
-      this.props.player.on("track:end",    this.next.bind(this));
-    },
+    mixins: [stateTree.mixin, dispatcherMixin],
+    cursor: ["player"],
 
     togglePlay: function() {
-      if (this.state.playing)
-        this.props.player.pause();
-      else if (this.props.player.track)
-        this.props.player.play();
+      var player = this.cursor.get();
+
+      if (player.playing)
+        this.actions.player.pause();
+      else if (player.track)
+        this.actions.player.play();
       else
-        this.props.player.play(this.props.queue.next());
+        this.actions.player.next();
     },
 
     previous: function() {
-      var track = this.props.queue.previous();
-      if (track)
-        this.props.player.play(track);
+      this.actions.player.previous();
     },
 
     next: function() {
-      var track = this.props.queue.next();
-      if (track)
-        this.props.player.play(track);
+      this.actions.player.next();
     },
 
     render: function() {
-      var playingIcon = this.state.playing ? "fa-pause" : "fa-play";
+      var playingIcon = this.cursor.get('playing') ? "fa-pause" : "fa-play";
 
       return (
         <div role="toolbar" className="player">
@@ -108,20 +84,11 @@ define(function(require, exports, module) {
   });
 
   var Progress = React.createClass({
-    getInitialState: function() {
-      return {progress: 0};
-    },
-
-    componentDidMount: function() {
-      var changeProgressState = function(progress) {
-        this.setState({progress: progress});
-      }.bind(this);
-
-      this.props.player.on("track:progress", changeProgressState);
-    },
+    mixins: [stateTree.mixin, dispatcherMixin],
+    cursor: ['player', 'progress'],
 
     render: function() {
-      var style = {width: this.state.progress + "%"}
+      var style = {width: this.cursor.get() + "%"}
       return (
         <div className="progress">
           <div className="bar" style={style}>
@@ -132,21 +99,11 @@ define(function(require, exports, module) {
   });
 
   var Queue = React.createClass({
-    getInitialState: function() {
-      return {tracks: []};
-    },
-
-    componentDidMount: function() {
-      this.props.queue.on("add" , this.onAddedTrack);
-    },
-
-    onAddedTrack: function(track) {
-      this.setState({tracks: this.props.queue.slice()});
-    },
+    mixins: [stateTree.mixin, dispatcherMixin],
+    cursor: ['queue'],
 
     render: function() {
-      var player = this.props.player;
-      var queue  = this.props.queue;
+      var tracks = this.cursor.get('tracks').toArray();
       var className = React.addons.classSet({
         queue: true,
         panel: true,
@@ -156,12 +113,12 @@ define(function(require, exports, module) {
       return (
         <section className={className} data-type="list" data-position="right">
           <ul>
-            {this.state.tracks.map(function(track) {
-              return <Track track={track} player={player} queue={queue}/>;
+            {tracks.map(function(track, index) {
+              return <Track track={track} index={index}/>;
             }.bind(this))}
           </ul>
-          <Progress player={player}/>
-          <Player player={player} queue={queue}/>
+          <Progress/>
+          <Player/>
         </section>
       );
     }

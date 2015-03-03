@@ -1,7 +1,8 @@
 define(function(require, exports, module) {
   var ID3 = require("lib/id3");
 
-  function Track(blob) {
+  function Track(blob, hash) {
+    // XXX: Parse tags outside of the constructor
     var parser = new ID3.ID3v2Parser();
     // XXX: ID3v2Parser#parse should accepts any kind of typed array
     // instead of expecting a Uint8Array;
@@ -11,38 +12,24 @@ define(function(require, exports, module) {
     this.album  = tags.album;
     this.artist = tags.artist;
     this.data   = blob;
+    this.hash   = hash;
   }
 
   Track.prototype = {
     toFile: function() {
       return new Blob([this.data], {type: "audio/mpeg"});
-    }
-  };
-
-  function TrackList() {
-    this.tracks = [];
-  }
-
-  TrackList.prototype = {
-    add: function(track) {
-      this.tracks.push(track);
-      this.emit("add", track);
-      return this;
     },
 
-    map: function() {
-      return this.tracks.map.apply(this.tracks, arguments);
+    hashCode: function() {
+      return parseInt(this.hash.slice(this.hash.length - 8), 16);
     },
 
-    slice: function() {
-      return this.tracks.slice.apply(this.tracks, arguments);
+    equals: function(other) {
+      return this.hash === other.hash;
     }
   };
-
-  MicroEvent.mixin(TrackList);
 
   return  {
     Track: Track,
-    TrackList: TrackList
   }
 });
