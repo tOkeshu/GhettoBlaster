@@ -1,19 +1,20 @@
 define(function(require, exports, module) {
-  var ID3 = require("lib/id3");
+  var uuid = require("lib/uuid");
 
-  function Track(blob, hash) {
-    // XXX: Parse tags outside of the constructor
-    var parser = new ID3.ID3v2Parser();
-    // XXX: ID3v2Parser#parse should accepts any kind of typed array
-    // instead of expecting a Uint8Array;
-    tags = parser.parse(new Uint8Array(blob));
+  function Track(options) {
+    this.id     = options.id || options._id;
+    this._id    = options.id || options._id;
+    this.title  = options.title;
+    this.album  = options.album;
+    this.artist = options.artist;
+    this.data   = options.data;
+    this.hash   = options.hash;
 
-    this.title  = tags.title;
-    this.album  = tags.album;
-    this.artist = tags.artist;
-    this.data   = blob;
-    this.hash   = hash;
+    this.artistId = options.artistId || null;
+    this.albumId  = options.albumId  || null;
   }
+
+  Track.id = uuid;
 
   Track.prototype = {
     toFile: function() {

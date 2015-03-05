@@ -21,15 +21,17 @@ define(function(require, exports, module) {
     },
 
     read: function(file, callback) {
-      var reader = new FileReader();
+      return new Promise(function(resolve, reject) {
+        var reader = new FileReader();
 
-      reader.onload = function(event) {
-        var blob = event.target.result;
-        sha256(blob, function(hash) {
-          callback(blob, hash);
-        });
-      };
-      reader.readAsArrayBuffer(file);
+        reader.onload = function(event) {
+          var blob = event.target.result;
+          sha256(blob, function(hash) {
+            resolve(callback(blob, hash));
+          });
+        };
+        reader.readAsArrayBuffer(file);
+      });
     }
   };
 

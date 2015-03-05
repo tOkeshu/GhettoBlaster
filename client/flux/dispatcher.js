@@ -1,6 +1,9 @@
 define(function(require, exports, module) {
   var Track          = require("models/tracks").Track;
+  var Album          = require("models/albums").Album;
+  var Artist         = require("models/artists").Artist;
   var FileListReader = require("lib/file-list-reader");
+  var db             = require("flux/db");
 
   function PlayerDispatcher(initialState) {
     this.state  = initialState;
@@ -111,12 +114,107 @@ define(function(require, exports, module) {
       var reader = new FileListReader();
       var files  = files;
 
-      reader.filter(files).by('audio/mpeg').forEach(function(file) {
-        reader.read(file, function(blob, hash) {
-          var track = new Track(blob, hash);
-          tracks.edit(tracks.get().add(track));
+      Promise.all(reader.filter(files).by('audio/mpeg').map(function(file) {
+        return reader.read(file, function(blob, hash) {
+          var parser = new ID3.ID3v2Parser();
+          // XXX: ID3v2Parser#parse should accepts any kind of typed array
+          // instead of expecting a Uint8Array;
+          var tags = parser.parse(new Uint8Array(blob));
+
+          return new Track({
+            id:     Track.id(),
+            title:  tags.title,
+            album:  tags.album,
+            artist: tags.artist,
+            data:   blob,
+            hash:   hash
+          });
         }.bind(this));
-      }.bind(this));
+      }.bind(this)))
+      // create all albums
+        .then(function(tracks) {
+          var library = {
+            artists: [],
+            albums: [],
+            tracks: tracks
+          };
+
+          library.albums = tracks.reduce(function(albums, track) {
+            var album = albums.get(track.album) || new Album({
+              id: Album.id(),
+              name: track.album,
+              artist: track.artist
+            });
+
+            album.tracks.push(track.id);
+
+            return albums.set(track.album, album);
+          }, Immutable.Map()).toArray();
+
+          return library;
+        })
+      // create all artists
+        .then(function(library) {
+          return Promise.all(library.albums.reduce(function(artists, album) {
+            var albums = artists.get(album.artist) || [];
+            albums.push(album.id);
+            return artists.set(album.artist, albums);
+          }, Immutable.Map()).map(function(albums, name) {
+            return db.artists.query(function(doc) {
+              if (doc.name === name)
+                emit(doc);
+            }).then(function(result) {
+              var artist;
+
+              if (result.rows.length === 0)
+                artist = new Artist({id: Artist.id(), name: name});
+              else
+                artist = new Artist(result.rows[0]);
+
+              artist.albums = artist.albums.concat(albums);
+              return artist;
+            });
+          }).toArray()).then(function(artists) {
+            library.artists = artists;
+            return library;
+          });
+        })
+        .then(function(library) {
+          var tracks  = library.tracks;
+          var albums  = library.albums;
+          var artists = library.artists;
+
+          albums = albums.reduce(function(albums, album) {
+            albums[album.id] = album;
+            return albums;
+          }, {});
+
+          tracks = tracks.reduce(function(tracks, track) {
+            tracks[track.id] = track;
+            return tracks;
+          }, {});
+
+          artists.forEach(function(artist) {
+            artist.albums.forEach(function(albumId) {
+              var album = albums[albumId];
+              album.artistId = artist.id;
+              album.tracks.forEach(function(trackId) {
+                var track = tracks[trackId];
+                track.artistId = artist.id;
+                track.albumId  = album.id;
+              });
+            });
+          });
+
+          return library;
+        })
+        .then(function(library) {
+          return Promise.all([
+            db.artists.bulkDocs(library.artists),
+            db.albums.bulkDocs(library.albums),
+            db.tracks.bulkDocs(library.tracks)
+          ]);
+        });
     }
   };
 
