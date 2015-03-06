@@ -1,2 +1,2738 @@
 /* baobab.js - Version: 0.3.2 - Author: Yomguithereal (Guillaume Plique) */
-!function(t){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=t();else if("function"==typeof define&&define.amd)define([],t);else{var e;e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:this,e.Baobab=t()}}(function(){var t;return function e(t,r,n){function o(s,a){if(!r[s]){if(!t[s]){var h="function"==typeof require&&require;if(!a&&h)return h(s,!0);if(i)return i(s,!0);var u=new Error("Cannot find module '"+s+"'");throw u.code="MODULE_NOT_FOUND",u}var c=r[s]={exports:{}};t[s][0].call(c.exports,function(e){var r=t[s][1][e];return o(r?r:e)},c,c.exports,e,t,r,n)}return r[s].exports}for(var i="function"==typeof require&&require,s=0;s<n.length;s++)o(n[s]);return o}({1:[function(t,e){e.exports={autoCommit:!0,asynchronous:!0,clone:!1,cloningFunction:null,cursorSingletons:!0,maxHistory:0,mixins:[],shiftReferences:!1,typology:null,validate:null}},{}],2:[function(t,e){var r=t("./src/baobab.js"),n=t("./src/helpers.js");Object.defineProperty(r,"version",{value:"0.3.2"}),r.getIn=n.getIn,e.exports=r},{"./src/baobab.js":6,"./src/helpers.js":9}],3:[function(t,e){function r(){if(!s){s=!0;for(var t,e=i.length;e;){t=i,i=[];for(var r=-1;++r<e;)t[r]();e=i.length}s=!1}}function n(){}var o=e.exports={},i=[],s=!1;o.nextTick=function(t){i.push(t),s||setTimeout(r,0)},o.title="browser",o.browser=!0,o.env={},o.argv=[],o.version="",o.on=n,o.addListener=n,o.once=n,o.off=n,o.removeListener=n,o.removeAllListeners=n,o.emit=n,o.binding=function(){throw new Error("process.binding is not supported")},o.cwd=function(){return"/"},o.chdir=function(){throw new Error("process.chdir is not supported")},o.umask=function(){return 0}},{}],4:[function(e,r,n){(function(){"use strict";var e={once:"boolean",scope:"object"},o=function(){this._enabled=!0,this._children=[],this._handlers={},this._handlersAll=[]};o.prototype.on=function(t,r,n){var i,s,a,h,u,c;if("function"==typeof r){for(u="string"==typeof t?[t]:t,i=0,s=u.length;i!==s;i+=1)if(h=u[i]){this._handlers[h]||(this._handlers[h]=[]),c={handler:r};for(a in n||{}){if(!e[a])throw new Error('The option "'+a+'" is not recognized by Emmett.');c[a]=n[a]}this._handlers[h].push(c)}}else if(t&&"object"==typeof t&&!Array.isArray(t))for(h in t)o.prototype.on.call(this,h,t[h],r);else{if("function"!=typeof t)throw new Error("Wrong arguments.");c={handler:t};for(a in n||{}){if(!e[a])throw new Error('The option "'+a+'" is not recognized by Emmett.');c[a]=n[a]}this._handlersAll.push(c)}return this},o.prototype.once=function(t,e,r){if("function"==typeof e)r=r||{},r.once=!0,this.on(t,e,r);else{if((!t||"object"!=typeof t||Array.isArray(t))&&"function"!=typeof t)throw new Error("Wrong arguments.");e=e||{},e.once=!0,this.on(t,e)}return this},o.prototype.off=function(t,e){var r,n,o,i,s,a,h,u="string"==typeof t?[t]:t;if(1===arguments.length&&"function"==typeof u){e=arguments[0];for(s in this._handlers){for(a=[],r=0,n=this._handlers[s].length;r!==n;r+=1)this._handlers[s][r].handler!==e&&a.push(this._handlers[s][r]);this._handlers[s]=a}for(a=[],r=0,n=this._handlersAll.length;r!==n;r+=1)this._handlersAll[r].handler!==e&&a.push(this._handlersAll[r]);this._handlersAll=a}else if(2===arguments.length)for(r=0,n=u.length;r!==n;r+=1){if(h=u[r],this._handlers[h]){for(a=[],o=0,i=this._handlers[h].length;o!==i;o+=1)this._handlers[h][o].handler!==e&&a.push(this._handlers[h][o]);this._handlers[h]=a}this._handlers[h]&&0===this._handlers[h].length&&delete this._handlers[h]}return this},o.prototype.unbindAll=function(){var t;this._handlersAll=[];for(t in this._handlers)delete this._handlers[t];return this},o.prototype.emit=function(t,e){var r,n,o,i,s,a,h,u,c,f="string"==typeof t?[t]:t;if(!this._enabled)return this;for(e=void 0===e?{}:e,r=0,n=f.length;r!==n;r+=1)if(c=f[r],u=(this._handlers[c]||[]).concat(this._handlersAll),u.length){for(a={type:c,data:e||{},target:this},s=[],o=0,i=u.length;o!==i;o+=1)u[o].handler.call("scope"in u[o]?u[o].scope:this,a),u[o].once||s.push(u[o]);this._handlers[c]=s}for(r=0,n=this._children.length;r!==n;r+=1)h=this._children[r],h.emit.apply(h,arguments);return this},o.prototype.child=function(){var t=this,e=new o;return e.on("emmett:kill",function(){if(t._children)for(var r=0,n=t._children.length;n>r;r++)if(t._children[r]===e){t._children.splice(r,1);break}}),this._children.push(e),e},o.prototype.kill=function(){if(this.emit("emmett:kill"),this.unbindAll(),this._handlers=null,this._handlersAll=null,this._enabled=!1,this._children)for(var t=0,e=this._children.length;e>t;t++)this._children[t].kill();this._children=null},o.prototype.disable=function(){return this._enabled=!1,this},o.prototype.enable=function(){return this._enabled=!0,this},o.version="2.1.1","undefined"!=typeof n?("undefined"!=typeof r&&r.exports&&(n=r.exports=o),n.Emitter=o):"function"==typeof t&&t.amd?t("emmett",[],function(){return o}):this.Emitter=o}).call(this)},{}],5:[function(e,r,n){!function(){"use strict";function e(t){function e(t,o){var s,a,h,u,c,f,l,p,d=!1,y=!1,g=r.get(t);if("string"===r.get(o)){for(s=o.replace(/^[\?\!]/,"").split(/\|/),h=s.length,a=0;h>a;a++)if(i.indexOf(s[a])<0&&!(s[a]in n))throw new Error("Invalid type.");if(o.match(/^\?/)&&(d=!0),o.replace(/^\?/,"").match(/^\!/)&&(y=!0),y&&d)throw new Error("Invalid type.");for(a in s)if(n[s[a]]&&("function"==typeof n[s[a]].type?n[s[a]].type.call(r,t)===!0:!e(t,n[s[a]].type)))return y?(c=new Error,c.message='Expected a "'+o+'" but found a "'+s[a]+'".',c.expected=o,c.type=s[a],c.value=t,c):null;return null===t||void 0===t?y||d?null:(c=new Error,c.message='Expected a "'+o+'" but found a "'+g+'".',c.expected=o,c.type=g,c.value=t,c):(l=~s.indexOf("*"),p=~s.indexOf(g),y&&(l||p)?(c=new Error,c.message='Expected a "'+o+'" but found a "'+(p?g:"*")+'".',c.type=p?g:"*",c.expected=o,c.value=t,c):y||l||p?null:(c=new Error,c.message='Expected a "'+o+'" but found a "'+g+'".',c.expected=o,c.type=g,c.value=t,c))}if("object"===r.get(o)){if("object"!==g)return c=new Error,c.message='Expected an object but found a "'+g+'".',c.expected=o,c.type=g,c.value=t,c;for(u in o)if(f=e(t[u],o[u]))return c=f,c.path=c.path?[u].concat(c.path):[u],c;for(u in t)if(void 0===o[u])return c=new Error,c.message='Unexpected key "'+u+'".',c.type=g,c.value=t,c;return null}if("array"===r.get(o)){if(1!==o.length)throw new Error("Invalid type.");if("array"!==g)return c=new Error,c.message='Expected an array but found a "'+g+'".',c.expected=o,c.type=g,c.value=t,c;for(h=t.length,a=0;h>a;a++)if(f=e(t[a],o[0]))return c=f,c.path=c.path?[a].concat(c.path):[a],c;return null}throw new Error("Invalid type.")}var r=this,n={};if(this.add=function(t,e){var r,o,s,a,h,u;if(1===arguments.length){if("object"!==this.get(t))throw new Error("If types.add is called with one argument, this one has to be an object.");r=t,a=r.id,u=r.type}else{if(2!==arguments.length)throw new Error("types.add has to be called with one or two arguments.");if("string"!=typeof t||!t)throw new Error("If types.add is called with more than one argument, the first one must be the string id.");a=t,u=e}if("string"!==this.get(a)||0===a.length)throw new Error("A type requires an string id.");if(void 0!==n[a]&&"proto"!==n[a])throw new Error('The type "'+a+'" already exists.');if(~i.indexOf(a))throw new Error('"'+a+'" is a reserved type name.');n[a]=1,s=(r||{}).proto||[],s=Array.isArray(s)?s:[s],h={};for(o in s)void 0===n[s[o]]&&(n[s[o]]=1,h[s[o]]=1);if("function"!==this.get(u)&&!this.isValid(u))throw new Error("A type requires a valid definition. This one can be a preexistant type or else a function testing given objects.");if(n[a]=void 0===r?{id:a,type:u}:{},void 0!==r)for(o in r)n[a][o]=r[o];for(o in h)o!==a&&delete n[o];return this},this.has=function(t){return!!n[t]},this.get=function(t){return null===t||void 0===t?String(t):o[Object.prototype.toString.call(t)]||"object"},this.check=function(t,r,n){var o=e(t,r);if(n&&o)throw o;return!o},this.isValid=function(t){var e,r,o;if("string"===this.get(t)){e=t.replace(/^[\?\!]/,"").split(/\|/);for(o in e)if(i.indexOf(e[o])<0&&!(e[o]in n))return!1;return!0}if("object"===this.get(t)){for(r in t)if(!this.isValid(t[r]))return!1;return!0}return"array"===this.get(t)&&1===t.length?this.isValid(t[0]):!1},this.add("type",function(t){return this.isValid(t)}.bind(this)),this.add("primitive",function(t){return!t||!(t instanceof Object||"object"==typeof t)}),t=t||{},"object"!==this.get(t))throw Error("Invalid argument.");for(var s in t)this.add(s,t[s])}var o={},i=["*"];!function(){var t,e,r=["Arguments","Boolean","Number","String","Function","Array","Date","RegExp","Object"];for(t in r)e=r[t],i.push(e.toLowerCase()),o["[object "+e+"]"]=e.toLowerCase()}();var s=e;e.call(s),Object.defineProperty(s,"version",{value:"0.3.1"}),"undefined"!=typeof n?("undefined"!=typeof r&&r.exports&&(n=r.exports=s),n.types=s):"function"==typeof t&&t.amd?t("typology",[],function(){return s}):this.types=s}(this)},{}],6:[function(t,e){(function(r){function n(t,e){if(!(this instanceof n))return new n(t,e);if(!l.Object(t)&&!l.Array(t))throw Error("Baobab: invalid data.");if(i.call(this),this.options=a.shallowMerge(f,e),this._cloner=this.options.cloningFunction||a.deepClone,this._futureUpdate={},this._willUpdate=!1,this._history=[],this._registeredCursors={},this.typology=this.options.typology?this.options.typology instanceof s?this.options.typology:new s(this.options.typology):new s,this.validate=this.options.validate||null,this.validate)try{this.typology.check(t,this.validate,!0)}catch(r){throw r.message="/"+r.path.join("/")+": "+r.message,r}this.data=this._cloner(t),this.mixin=c.baobab(this)}var o=t("./cursor.js"),i=t("emmett"),s=t("typology"),a=t("./helpers.js"),h=t("./update.js"),u=t("./merge.js"),c=t("./mixins.js"),f=t("../defaults.js"),l=t("./type.js");a.inherits(n,i),n.prototype._stack=function(t){var e=this;if(!l.Object(t))throw Error("Baobab.update: wrong specification.");return this._futureUpdate=u(t,this._futureUpdate),this.options.autoCommit?this.options.asynchronous?(this._willUpdate||(this._willUpdate=!0,r.nextTick(function(){e._willUpdate&&e.commit()})),this):this.commit():this},n.prototype._archive=function(){if(!(this.options.maxHistory<=0)){var t={data:this._cloner(this.data)};return this._history.length===this.options.maxHistory&&this._history.pop(),this._history.unshift(t),t}},n.prototype.commit=function(t){var e;if(t)this.data=t.data,e=t.log;else{this.options.shiftReferences&&(this.data=a.shallowClone(this.data));var r=this._archive();e=h(this.data,this._futureUpdate,this.options),r&&(r.log=e)}if(this.validate){var n,o,i=[],s=e.length;for(o=0;s>o;o++)if(n=a.getIn(this.validate,e[o]))try{this.typology.check(this.get(e[o]),n,!0)}catch(u){u.path=e[o].concat(u.path||[]),i.push(u)}i.length&&this.emit("invalid",{errors:i})}return this.emit("update",{log:e}),this._futureUpdate={},this._willUpdate=!1,this},n.prototype.select=function(t){if(arguments.length>1&&(t=a.arrayOf(arguments)),!l.Path(t))throw Error("Baobab.select: invalid path.");t=l.Array(t)?t:[t];var e,r=l.ComplexPath(t);if(r&&(e=a.solvePath(this.data,t)),this.options.cursorSingletons){var n=t.join("λ");if(this._registeredCursors[n])return this._registeredCursors[n];var i=new o(this,t,e);return this._registeredCursors[n]=i,i}return new o(this,t)},n.prototype.reference=function(t){if(arguments.length>1&&(t=a.arrayOf(arguments)),!l.Path(t))throw Error("Baobab.get: invalid path.");return a.getIn(this.data,l.String(t)||l.Number(t)?[t]:t)},n.prototype.get=function(){var t=this.reference.apply(this,arguments);return this.options.clone?this._cloner(t):t},n.prototype.clone=function(){return this._cloner(this.reference.apply(this,arguments))},n.prototype.set=function(t,e){if(arguments.length<2)throw Error("Baobab.set: expects a key and a value.");var r={};return r[t]={$set:e},this.update(r)},n.prototype.update=function(t){return this._stack(t)},n.prototype.hasHistory=function(){return!!this._history.length},n.prototype.getHistory=function(){return this._history},n.prototype.undo=function(){if(!this.hasHistory())throw Error("Baobab.undo: no history recorded, cannot undo.");var t=this._history.shift();this.commit(t)},n.prototype.release=function(){this.unbindAll(),delete this.data,delete this._futureUpdate,delete this._history,delete this._registeredCursors},n.prototype.toJSON=function(){return this.reference()},e.exports=n}).call(this,t("_process"))},{"../defaults.js":1,"./cursor.js":8,"./helpers.js":9,"./merge.js":10,"./mixins.js":11,"./type.js":12,"./update.js":13,_process:3,emmett:4,typology:5}],7:[function(t,e){function r(t,e){e.on("update",t.cursorListener)}function n(t){var e=this;if(arguments.length<2)throw Error("baobab.Combination: not enough arguments.");var n=arguments[1],o=s.arrayOf(arguments).slice(2);if(n instanceof Array&&(o=n.slice(1),n=n[0]),!a.Cursor(n))throw Error("baobab.Combination: argument should be a cursor.");if("or"!==t&&"and"!==t)throw Error("baobab.Combination: invalid operator.");i.call(this),this.cursors=[n],this.operators=[],this.root=n.root,this.updates=new Array(this.cursors.length),this.cursorListener=function(){e.updates[e.cursors.indexOf(this)]=!0},this.treeListener=function(){var t,r,n=e.updates[0];for(t=1,r=e.cursors.length;r>t;t++)n="or"===e.operators[t-1]?n||e.updates[t]:n&&e.updates[t];n&&e.emit("update"),e.updates=new Array(e.cursors.length)},this.root.on("update",this.treeListener),r(this,n),o.forEach(function(e){this[t](e)},this)}function o(t){n.prototype[t]=function(e){if(!a.Cursor(e))throw Error("baobab.Combination."+t+": argument should be a cursor.");if(~this.cursors.indexOf(e))throw Error("baobab.Combination."+t+": cursor already in combination.");return this.cursors.push(e),this.operators.push(t),this.updates.length++,r(this,e),this}}var i=t("emmett"),s=t("./helpers.js"),a=t("./type.js");s.inherits(n,i),o("or"),o("and"),n.prototype.release=function(){this.unbindAll(),this.cursors.forEach(function(t){t.off("update",this.cursorListener)},this),this.root.off("update",this.treeListener),this.cursors=null,this.operators=null,this.root=null,this.updates=null},e.exports=n},{"./helpers.js":9,"./type.js":12,emmett:4}],8:[function(t,e){function r(t,e,r){var o=this;n.call(this),e=e||[],this.root=t,this.path=e,this.relevant=void 0!==this.reference(),this.complexPath=!!r,this.solvedPath=this.complexPath?r:this.path,this.updateHandler=function(t){var e,r,n,i,a,h,u=t.data.log,c=!1;if(o.complexPath&&(o.solvedPath=s.solvePath(o.root.data,o.path)),this._handlers.update.length||this._handlersAll.length){if(!o.path.length)return o.emit("update");t:for(a=0,n=u.length;n>a;a++)for(e=u[a],h=0,i=e.length;i>h&&(r=e[h],r===""+o.solvedPath[h]);h++)if(h+1===i||h+1===o.solvedPath.length){c=!0;break t}var f=void 0!==o.reference();o.relevant?f&&c?o.emit("update"):f||(o.emit("irrelevant"),o.relevant=!1):f&&c&&(o.emit("relevant"),o.emit("update"),o.relevant=!0)}},this.root.on("update",this.updateHandler),this.mixin=i.cursor(this)}var n=t("emmett"),o=t("./combination.js"),i=t("./mixins.js"),s=t("./helpers.js"),a=t("./type.js");s.inherits(r,n),r.prototype._stack=function(t){return this.root._stack(s.pathObject(this.solvedPath,t)),this},r.prototype.isRoot=function(){return!this.path.length},r.prototype.isLeaf=function(){return a.Primitive(this.reference())},r.prototype.isBranch=function(){return!this.isLeaf()&&!this.isRoot()},r.prototype.select=function(t){if(arguments.length>1&&(t=s.arrayOf(arguments)),!a.Path(t))throw Error("baobab.Cursor.select: invalid path.");return this.root.select(this.path.concat(t))},r.prototype.up=function(){return this.solvedPath&&this.solvedPath.length?this.root.select(this.path.slice(0,-1)):null},r.prototype.left=function(){var t=+this.solvedPath[this.solvedPath.length-1];if(isNaN(t))throw Error("baobab.Cursor.left: cannot go left on a non-list type.");return t?this.root.select(this.solvedPath.slice(0,-1).concat(t-1)):null},r.prototype.leftmost=function(){var t=+this.solvedPath[this.solvedPath.length-1];if(isNaN(t))throw Error("baobab.Cursor.leftmost: cannot go left on a non-list type.");return this.root.select(this.solvedPath.slice(0,-1).concat(0))},r.prototype.right=function(){var t=+this.solvedPath[this.solvedPath.length-1];if(isNaN(t))throw Error("baobab.Cursor.right: cannot go right on a non-list type.");return t+1===this.up().reference().length?null:this.root.select(this.solvedPath.slice(0,-1).concat(t+1))},r.prototype.rightmost=function(){var t=+this.solvedPath[this.solvedPath.length-1];if(isNaN(t))throw Error("baobab.Cursor.right: cannot go right on a non-list type.");var e=this.up().reference();return this.root.select(this.solvedPath.slice(0,-1).concat(e.length-1))},r.prototype.down=function(){+this.solvedPath[this.solvedPath.length-1];return this.reference()instanceof Array?this.root.select(this.solvedPath.concat(0)):null},r.prototype.get=function(t){return arguments.length>1&&(t=s.arrayOf(arguments)),this.root.get(a.Step(t)?this.solvedPath.concat(t):this.solvedPath)},r.prototype.reference=function(t){return arguments.length>1&&(t=s.arrayOf(arguments)),this.root.reference(a.Step(t)?this.solvedPath.concat(t):this.solvedPath)},r.prototype.clone=function(t){return arguments.length>1&&(t=s.arrayOf(arguments)),this.root.clone(a.Step(t)?this.solvedPath.concat(t):this.solvedPath)},r.prototype.set=function(t,e){if(arguments.length<2)throw Error("baobab.Cursor.set: expecting at least key/value.");var r={};return r[t]={$set:e},this.update(r)},r.prototype.edit=function(t){return this.update({$set:t})},r.prototype.apply=function(t){if("function"!=typeof t)throw Error("baobab.Cursor.apply: argument is not a function.");return this.update({$apply:t})},r.prototype.thread=function(t){if("function"!=typeof t)throw Error("baobab.Cursor.thread: argument is not a function.");return this.update({$thread:t})},r.prototype.push=function(t){if(!(this.reference()instanceof Array))throw Error("baobab.Cursor.push: trying to push to non-array value.");return this.update(arguments.length>1?{$push:s.arrayOf(arguments)}:{$push:t})},r.prototype.unshift=function(t){if(!(this.reference()instanceof Array))throw Error("baobab.Cursor.push: trying to push to non-array value.");return this.update(arguments.length>1?{$unshift:s.arrayOf(arguments)}:{$unshift:t})},r.prototype.merge=function(t){if(!a.Object(t))throw Error("baobab.Cursor.merge: trying to merge a non-object.");if(!a.Object(this.reference()))throw Error("baobab.Cursor.merge: trying to merge into a non-object.");this.update({$merge:t})},r.prototype.update=function(t){return this._stack(t)},r.prototype.or=function(t){return new o("or",this,t)},r.prototype.and=function(t){return new o("and",this,t)},r.prototype.release=function(){this.root.off("update",this.updateHandler),this.root=null,this.unbindAll()},r.prototype.toJSON=function(){return this.reference()},a.Cursor=function(t){return t instanceof r},e.exports=r},{"./combination.js":7,"./helpers.js":9,"./mixins.js":11,"./type.js":12,emmett:4}],9:[function(t,e){function r(t){return Array.prototype.slice.call(t)}function n(t,e){var r,n={};for(r in t)n[r]=t[r];for(r in e)n[r]=e[r];return n}function o(t){if(!(t&&t instanceof Object))return t;if(g.Array(t))return t.slice(0);if(g.Date(t))return new Date(t.getTime());if(g.Object(t)){var e,r={};for(e in t)r[e]=t[e];return r}return t}function i(t){if(!(t&&t instanceof Object))return t;if(g.Array(t)){var e,r,n=[];for(e=0,r=t.length;r>e;e++)n.push(i(t[e]));return n}if(g.Date(t))return new Date(t.getTime());if(g.Object(t)){var o,s={};for(o in t)s[o]=i(t[o]);return s}return t}function s(t,e){return function(r){return e(t(r))}}function a(t,e){var r,n;for(r=0,n=t.length;n>r;r++)if(e(t[r]))return t[r]}function h(t,e){var r,n;for(r=0,n=t.length;n>r;r++)if(e(t[r]))return r;return-1}function u(t,e){var r,n=!0;for(r in e)if(g.Object(e[r]))n=n&&u(t[r]);else if(g.Array(e[r]))n=n&&!!~e[r].indexOf(t[r]);else if(t[r]!==e[r])return!1;return n}function c(t,e){return a(t,function(t){return u(t,e)})}function f(t,e){return h(t,function(t){return u(t,e)})}function l(t,e){e=e||[];var r,n,o=t;for(r=0,n=e.length;n>r;r++){if(!o)return;if("function"==typeof e[r]){if(!g.Array(o))return;o=a(o,e[r])}else if("object"==typeof e[r]){if(!g.Array(o))return;o=c(o,e[r])}else o=o[e[r]]}return o}function p(t,e){var r,n,o,i=[],s=t;for(n=0,o=e.length;o>n;n++){if(!s)return null;if("function"==typeof e[n]){if(!g.Array(s))return;r=h(s,e[n]),i.push(r),s=s[r]}else if("object"==typeof e[n]){if(!g.Array(s))return;r=f(s,e[n]),i.push(r),s=s[r]}else i.push(e[n]),s=s[e[n]]}return i}function d(t,e){var r,n=t.length,o={},i=o;for(n||(o=e),r=0;n>r;r++)i[t[r]]=r+1===n?e:{},i=i[t[r]];return o}function y(t,e){t.super_=e;var r=function(){};r.prototype=e.prototype,t.prototype=new r,t.prototype.constructor=t}var g=t("./type.js");e.exports={arrayOf:r,deepClone:i,shallowClone:o,shallowMerge:n,compose:s,getIn:l,inherits:y,pathObject:d,solvePath:p}},{"./type.js":12}],10:[function(t,e){function r(t,e){return e in(t||{})}function n(t,e,n){return r(t,n)&&r(e,n)}function o(){var t,e,r,a,h={},u=arguments.length;for(r=u-1;r>=0;r--)if(arguments[r].$set)delete h.$apply,delete h.$merge,h.$set=arguments[r].$set;else if(arguments[r].$merge)delete h.$set,delete h.$apply,h.$merge=arguments[r].$merge;else if(arguments[r].$apply)delete h.$set,delete h.$merge,h.$apply=arguments[r].$apply;else if(arguments[r].$chain)delete h.$set,delete h.$merge,h.$apply=h.$apply?i.compose(h.$apply,arguments[r].$chain):arguments[r].$chain;else for(a in arguments[r])t=h[a],e=arguments[r][a],t&&s.Object(e)?n(t,e,"$push")?t.$push=s.Array(t.$push)?t.$push.concat(e.$push):[t.$push].concat(e.$push):n(t,e,"$unshift")?t.$unshift=s.Array(e.$unshift)?e.$unshift.concat(t.$unshift):[e.$unshift].concat(t.$unshift):h[a]=o(e,t):h[a]=e;return h}var i=t("./helpers.js"),s=t("./type.js");e.exports=o},{"./helpers.js":9,"./type.js":12}],11:[function(t,e){var r=t("./combination.js"),n=t("./type.js");e.exports={baobab:function(t){return{mixins:[{getInitialState:function(){if(this.tree=t,!this.cursor&&!this.cursors)return{};if(this.cursor&&this.cursors)throw Error("baobab.mixin: you cannot have both `component.cursor` and `component.cursors`. Please make up your mind.");if(this.__type=null,this.__updateHandler=function(){this.setState(this.__getCursorData())}.bind(this),this.cursor){if(!n.MixinCursor(this.cursor))throw Error("baobab.mixin.cursor: invalid data (cursor, string or array).");n.Cursor(this.cursor)||(this.cursor=t.select(this.cursor)),this.__getCursorData=function(){return{cursor:this.cursor.get()}}.bind(this),this.__type="single"}else if(this.cursors){if(-1===["object","array"].indexOf(n(this.cursors)))throw Error("baobab.mixin.cursor: invalid data (object or array).");if(n.Array(this.cursors))this.cursors=this.cursors.map(function(e){return n.Cursor(e)?e:t.select(e)}),this.__getCursorData=function(){return{cursors:this.cursors.map(function(t){return t.get()})}}.bind(this),this.__type="array";else{for(var e in this.cursors)n.Cursor(this.cursors[e])||(this.cursors[e]=t.select(this.cursors[e]));this.__getCursorData=function(){var t={};for(e in this.cursors)t[e]=this.cursors[e].get();return{cursors:t}}.bind(this),this.__type="object"}}return this.__getCursorData()},componentDidMount:function(){"single"===this.__type?(this.__combination=new r("or",[this.cursor]),this.__combination.on("update",this.__updateHandler)):"array"===this.__type?(this.__combination=new r("or",this.cursors),this.__combination.on("update",this.__updateHandler)):"object"===this.__type&&(this.__combination=new r("or",Object.keys(this.cursors).map(function(t){return this.cursors[t]},this)),this.__combination.on("update",this.__updateHandler))},componentWillUnmount:function(){this.__combination&&this.__combination.release()}}].concat(t.options.mixins)}},cursor:function(t){return{mixins:[{getInitialState:function(){return this.cursor=t,this.__updateHandler=function(){this.setState({cursor:this.cursor.get()})}.bind(this),{cursor:this.cursor.get()}},componentDidMount:function(){this.cursor.on("update",this.__updateHandler)},componentWillUnmount:function(){this.cursor.off("update",this.__updateHandler)}}].concat(t.root.options.mixins)}}}},{"./combination.js":7,"./type.js":12}],12:[function(t,e){var r=function(t){return Array.isArray(t)?"array":"object"==typeof t&&null!==t?"object":"string"==typeof t?"string":"number"==typeof t?"number":"boolean"==typeof t?"boolean":"function"==typeof t?"function":null===t?"null":void 0===t?"undefined":t instanceof Date?"date":"invalid"};r.Array=function(t){return Array.isArray(t)},r.Object=function(t){return!Array.isArray(t)&&"object"==typeof t&&null!==t},r.String=function(t){return"string"==typeof t},r.Number=function(t){return"number"==typeof t},r.Boolean=function(t){return"boolean"==typeof t},r.Function=function(t){return"function"==typeof t},r.Primitive=function(t){return"string"==typeof t||"number"==typeof t||"boolean"==typeof t},r.Date=function(t){return t instanceof Date},r.Step=function(t){var e=r(t),n=["null","undefined","invalid","date"];return-1===n.indexOf(e)},r.Path=function(t){var e=["object","string","number","function","undefined"];if(!r.Array(t))return e.indexOf(r(t))>=0;for(var n=0;n<t.length;n++)if(-1===e.indexOf(r(t[n])))return!1;return!0},r.MixinCursor=function(t){var e=["string","number","array"];return e.indexOf(r(t))>=0||r.Cursor(t)},r.ComplexPath=function(t){for(var e=["object","function"],n=!1,o=0;o<t.length;o++)e.indexOf(r(t[o]))>=0&&(n=!0);return n},e.exports=r},{}],13:[function(t,e){function r(t,e){var r=new Error("precursors.update: "+e+" at path /"+t.toString());return r.path=t,r}function n(t,e,n){n=n||{};var a={};return function h(t,e,u){u=u||[];var c,f,l,p,d=u.join("λ");for(l in e)if(s[l])switch(p=e[l],a[d]=!0,l){case"$push":if(!i.Array(t))throw r(u,"using command $push to a non array");i.Array(p)?t.push.apply(t,p):t.push(p);break;case"$unshift":if(!i.Array(t))throw r(u,"using command $unshift to a non array");i.Array(p)?t.unshift.apply(t,p):t.unshift(p)}else if(f=d?d+"λ"+l:l,"$set"in(e[l]||{}))p=e[l].$set,a[f]=!0,t[l]=p;else if("$apply"in(e[l]||{})){if(c=e[l].$apply,"function"!=typeof c)throw r(u.concat(l),"using command $apply with a non function");a[f]=!0,t[l]=c.call(null,t[l])}else if("$merge"in(e[l]||{})){if(p=e[l].$merge,!i.Object(t[l]))throw r(u.concat(l),"using command $merge on a non-object");a[f]=!0,t[l]=o.shallowMerge(t[l],p)}else if(n.shiftReferences&&("$push"in(e[l]||{})||"$unshift"in(e[l]||{}))){if("$push"in(e[l]||{})){if(p=e[l].$push,!i.Array(t[l]))throw r(u.concat(l),"using command $push to a non array");t[l]=t[l].concat(p)}if("$unshift"in(e[l]||{})){if(p=e[l].$unshift,!i.Array(t[l]))throw r(u.concat(l),"using command $unshift to a non array");t[l]=(p instanceof Array?p:[p]).concat(t[l])}a[f]=!0}else"undefined"==typeof t[l]&&(t[l]={}),n.shiftReferences&&(t[l]=o.shallowClone(t[l])),h(t[l],e[l],u.concat(l))}(t,e),Object.keys(a).map(function(t){return t.split("λ")})}var o=t("./helpers.js"),i=t("./type.js"),s={};["$set","$push","$unshift","$apply","$merge"].forEach(function(t){s[t]=!0}),e.exports=n},{"./helpers.js":9,"./type.js":12}]},{},[2])(2)});
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.Baobab = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/**
+ * Baobab Default Options
+ * =======================
+ *
+ */
+module.exports = {
+
+  // Should the tree handle its transactions on its own?
+  autoCommit: true,
+
+  // Should the transactions be handled asynchronously?
+  asynchronous: true,
+
+  // Should the tree clone data when giving it back to the user?
+  clone: false,
+
+  // Which cloning function should the tree use?
+  cloningFunction: null,
+
+  // Should cursors be singletons?
+  cursorSingletons: true,
+
+  // Maximum records in the tree's history
+  maxHistory: 0,
+
+  // Collection of react mixins to merge with the tree's ones
+  mixins: [],
+
+  // Should the tree shift its internal reference when applying mutations?
+  shiftReferences: false,
+
+  // Custom typology object to use along with the validation utilities
+  typology: null,
+
+  // Validation specifications
+  validate: null
+};
+
+},{}],2:[function(require,module,exports){
+/**
+ * Baobab Public Interface
+ * ========================
+ *
+ * Exposes the main library classes.
+ */
+var Baobab = require('./src/baobab.js'),
+    helpers = require('./src/helpers.js');
+
+// Non-writable version
+Object.defineProperty(Baobab, 'version', {
+  value: '0.3.2'
+});
+
+// Exposing helpers
+Baobab.getIn = helpers.getIn;
+
+// Exporting
+module.exports = Baobab;
+
+},{"./src/baobab.js":6,"./src/helpers.js":9}],3:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+var queue = [];
+var draining = false;
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    draining = true;
+    var currentQueue;
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        var i = -1;
+        while (++i < len) {
+            currentQueue[i]();
+        }
+        len = queue.length;
+    }
+    draining = false;
+}
+process.nextTick = function (fun) {
+    queue.push(fun);
+    if (!draining) {
+        setTimeout(drainQueue, 0);
+    }
+};
+
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+// TODO(shtylman)
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],4:[function(require,module,exports){
+(function() {
+  'use strict';
+
+  /**
+   * Here is the list of every allowed parameter when using Emitter#on:
+   * @type {Object}
+   */
+  var __allowedOptions = {
+    once: 'boolean',
+    scope: 'object'
+  };
+
+
+  /**
+   * The emitter's constructor. It initializes the handlers-per-events store and
+   * the global handlers store.
+   *
+   * Emitters are useful for non-DOM events communication. Read its methods
+   * documentation for more information about how it works.
+   *
+   * @return {Emitter}         The fresh new instance.
+   */
+  var Emitter = function() {
+    this._enabled = true;
+    this._children = [];
+    this._handlers = {};
+    this._handlersAll = [];
+  };
+
+
+  /**
+   * This method binds one or more functions to the emitter, handled to one or a
+   * suite of events. So, these functions will be executed anytime one related
+   * event is emitted.
+   *
+   * It is also possible to bind a function to any emitted event by not
+   * specifying any event to bind the function to.
+   *
+   * Recognized options:
+   * *******************
+   *  - {?boolean} once   If true, the handlers will be unbound after the first
+   *                      execution. Default value: false.
+   *  - {?object}  scope  If a scope is given, then the listeners will be called
+   *                      with this scope as "this".
+   *
+   * Variant 1:
+   * **********
+   * > myEmitter.on('myEvent', function(e) { console.log(e); });
+   * > // Or:
+   * > myEmitter.on('myEvent', function(e) { console.log(e); }, { once: true });
+   *
+   * @param  {string}   event   The event to listen to.
+   * @param  {function} handler The function to bind.
+   * @param  {?object}  options Eventually some options.
+   * @return {Emitter}          Returns this.
+   *
+   * Variant 2:
+   * **********
+   * > myEmitter.on(
+   * >   ['myEvent1', 'myEvent2'],
+   * >   function(e) { console.log(e); }
+   * >);
+   * > // Or:
+   * > myEmitter.on(
+   * >   ['myEvent1', 'myEvent2'],
+   * >   function(e) { console.log(e); }
+   * >   { once: true }}
+   * >);
+   *
+   * @param  {array}    events  The events to listen to.
+   * @param  {function} handler The function to bind.
+   * @param  {?object}  options Eventually some options.
+   * @return {Emitter}          Returns this.
+   *
+   * Variant 3:
+   * **********
+   * > myEmitter.on({
+   * >   myEvent1: function(e) { console.log(e); },
+   * >   myEvent2: function(e) { console.log(e); }
+   * > });
+   * > // Or:
+   * > myEmitter.on({
+   * >   myEvent1: function(e) { console.log(e); },
+   * >   myEvent2: function(e) { console.log(e); }
+   * > }, { once: true });
+   *
+   * @param  {object}  bindings An object containing pairs event / function.
+   * @param  {?object}  options Eventually some options.
+   * @return {Emitter}          Returns this.
+   *
+   * Variant 4:
+   * **********
+   * > myEmitter.on(function(e) { console.log(e); });
+   * > // Or:
+   * > myEmitter.on(function(e) { console.log(e); }, { once: true});
+   *
+   * @param  {function} handler The function to bind to every events.
+   * @param  {?object}  options Eventually some options.
+   * @return {Emitter}          Returns this.
+   */
+  Emitter.prototype.on = function(a, b, c) {
+    var i,
+        l,
+        k,
+        event,
+        eArray,
+        bindingObject;
+
+    // Variant 1 and 2:
+    if (typeof b === 'function') {
+      eArray = typeof a === 'string' ?
+        [a] :
+        a;
+
+      for (i = 0, l = eArray.length; i !== l; i += 1) {
+        event = eArray[i];
+
+        // Check that event is not '':
+        if (!event)
+          continue;
+
+        if (!this._handlers[event])
+          this._handlers[event] = [];
+
+        bindingObject = {
+          handler: b
+        };
+
+        for (k in c || {})
+          if (__allowedOptions[k])
+            bindingObject[k] = c[k];
+          else
+            throw new Error(
+              'The option "' + k + '" is not recognized by Emmett.'
+            );
+
+        this._handlers[event].push(bindingObject);
+      }
+
+    // Variant 3:
+    } else if (a && typeof a === 'object' && !Array.isArray(a))
+      for (event in a)
+        Emitter.prototype.on.call(this, event, a[event], b);
+
+    // Variant 4:
+    else if (typeof a === 'function') {
+      bindingObject = {
+        handler: a
+      };
+
+      for (k in c || {})
+        if (__allowedOptions[k])
+          bindingObject[k] = c[k];
+        else
+          throw new Error(
+            'The option "' + k + '" is not recognized by Emmett.'
+          );
+
+      this._handlersAll.push(bindingObject);
+    }
+
+    // No matching variant:
+    else
+      throw new Error('Wrong arguments.');
+
+    return this;
+  };
+
+
+  /**
+   * This method works exactly as the previous #on, but will add an options
+   * object if none is given, and set the option "once" to true.
+   *
+   * The polymorphism works exactly as with the #on method.
+   */
+  Emitter.prototype.once = function(a, b, c) {
+    // Variant 1 and 2:
+    if (typeof b === 'function') {
+      c = c || {};
+      c.once = true;
+      this.on(a, b, c);
+
+    // Variants 3 and 4:
+    } else if (
+      // Variant 3:
+      (a && typeof a === 'object' && !Array.isArray(a)) ||
+      // Variant 4:
+      (typeof a === 'function')
+    ) {
+      b = b || {};
+      b.once = true;
+      this.on(a, b);
+
+    // No matching variant:
+    } else
+      throw new Error('Wrong arguments.');
+
+    return this;
+  };
+
+
+  /**
+   * This method unbinds one or more functions from events of the emitter. So,
+   * these functions will no more be executed when the related events are
+   * emitted. If the functions were not bound to the events, nothing will
+   * happen, and no error will be thrown.
+   *
+   * Variant 1:
+   * **********
+   * > myEmitter.off('myEvent', myHandler);
+   *
+   * @param  {string}   event   The event to unbind the handler from.
+   * @param  {function} handler The function to unbind.
+   * @return {Emitter}          Returns this.
+   *
+   * Variant 2:
+   * **********
+   * > myEmitter.off(['myEvent1', 'myEvent2'], myHandler);
+   *
+   * @param  {array}    events  The events to unbind the handler from.
+   * @param  {function} handler The function to unbind.
+   * @return {Emitter}          Returns this.
+   *
+   * Variant 3:
+   * **********
+   * > myEmitter.off({
+   * >   myEvent1: myHandler1,
+   * >   myEvent2: myHandler2
+   * > });
+   *
+   * @param  {object} bindings An object containing pairs event / function.
+   * @return {Emitter}         Returns this.
+   *
+   * Variant 4:
+   * **********
+   * > myEmitter.off(myHandler);
+   *
+   * @param  {function} handler The function to unbind from every events.
+   * @return {Emitter}          Returns this.
+   */
+  Emitter.prototype.off = function(events, handler) {
+    var i,
+        n,
+        j,
+        m,
+        k,
+        a,
+        event,
+        eArray = typeof events === 'string' ?
+          [events] :
+          events;
+
+    if (arguments.length === 1 && typeof eArray === 'function') {
+      handler = arguments[0];
+
+      // Handlers bound to events:
+      for (k in this._handlers) {
+        a = [];
+        for (i = 0, n = this._handlers[k].length; i !== n; i += 1)
+          if (this._handlers[k][i].handler !== handler)
+            a.push(this._handlers[k][i]);
+        this._handlers[k] = a;
+      }
+
+      a = [];
+      for (i = 0, n = this._handlersAll.length; i !== n; i += 1)
+        if (this._handlersAll[i].handler !== handler)
+          a.push(this._handlersAll[i]);
+      this._handlersAll = a;
+    }
+
+    else if (arguments.length === 2) {
+      for (i = 0, n = eArray.length; i !== n; i += 1) {
+        event = eArray[i];
+        if (this._handlers[event]) {
+          a = [];
+          for (j = 0, m = this._handlers[event].length; j !== m; j += 1)
+            if (this._handlers[event][j].handler !== handler)
+              a.push(this._handlers[event][j]);
+
+          this._handlers[event] = a;
+        }
+
+        if (this._handlers[event] && this._handlers[event].length === 0)
+          delete this._handlers[event];
+      }
+    }
+
+    return this;
+  };
+
+
+  /**
+   * This method unbinds every handlers attached to every or any events. So,
+   * these functions will no more be executed when the related events are
+   * emitted. If the functions were not bound to the events, nothing will
+   * happen, and no error will be thrown.
+   *
+   * Usage:
+   * ******
+   * > myEmitter.unbindAll();
+   *
+   * @return {Emitter}      Returns this.
+   */
+  Emitter.prototype.unbindAll = function() {
+    var k;
+
+    this._handlersAll = [];
+    for (k in this._handlers)
+      delete this._handlers[k];
+
+    return this;
+  };
+
+
+  /**
+   * This method emits the specified event(s), and executes every handlers bound
+   * to the event(s).
+   *
+   * Use cases:
+   * **********
+   * > myEmitter.emit('myEvent');
+   * > myEmitter.emit('myEvent', myData);
+   * > myEmitter.emit(['myEvent1', 'myEvent2']);
+   * > myEmitter.emit(['myEvent1', 'myEvent2'], myData);
+   *
+   * @param  {string|array} events The event(s) to emit.
+   * @param  {object?}      data   The data.
+   * @return {Emitter}             Returns this.
+   */
+  Emitter.prototype.emit = function(events, data) {
+    var i,
+        n,
+        j,
+        m,
+        a,
+        event,
+        child,
+        handlers,
+        eventName,
+        self = this,
+        eArray = typeof events === 'string' ?
+          [events] :
+          events;
+
+    // Check that the emitter is enabled:
+    if (!this._enabled)
+      return this;
+
+    data = data === undefined ? {} : data;
+
+    for (i = 0, n = eArray.length; i !== n; i += 1) {
+      eventName = eArray[i];
+      handlers = (this._handlers[eventName] || []).concat(this._handlersAll);
+
+      if (handlers.length) {
+        event = {
+          type: eventName,
+          data: data || {},
+          target: this
+        };
+        a = [];
+
+        for (j = 0, m = handlers.length; j !== m; j += 1) {
+          handlers[j].handler.call(
+            'scope' in handlers[j] ? handlers[j].scope : this,
+            event
+          );
+          if (!handlers[j].once)
+            a.push(handlers[j]);
+        }
+
+        this._handlers[eventName] = a;
+      }
+    }
+
+    // Events propagation:
+    for (i = 0, n = this._children.length; i !== n; i += 1) {
+      child = this._children[i];
+      child.emit.apply(child, arguments);
+    }
+
+    return this;
+  };
+
+
+  /**
+   * This method creates a new instance of Emitter and binds it as a child. Here
+   * is what children do:
+   *  - When the parent emits an event, the children will emit the same later
+   *  - When a child is killed, it is automatically unreferenced from the parent
+   *  - When the parent is killed, all children will be killed as well
+   *
+   * @return {Emitter} Returns the fresh new child.
+   */
+  Emitter.prototype.child = function() {
+    var self = this,
+        child = new Emitter();
+
+    child.on('emmett:kill', function() {
+      if (self._children)
+        for (var i = 0, l = self._children.length; i < l; i++)
+          if (self._children[i] === child) {
+            self._children.splice(i, 1);
+            break;
+          }
+    });
+    this._children.push(child);
+
+    return child;
+  };
+
+
+  /**
+   * This method will first dispatch a "emmett:kill" event, and then unbinds all
+   * listeners and make it impossible to ever rebind any listener to any event.
+   */
+  Emitter.prototype.kill = function() {
+    this.emit('emmett:kill');
+
+    this.unbindAll();
+    this._handlers = null;
+    this._handlersAll = null;
+    this._enabled = false;
+
+    if (this._children)
+      for (var i = 0, l = this._children.length; i < l; i++)
+        this._children[i].kill();
+
+    this._children = null;
+  };
+
+
+  /**
+   * This method disabled the emitter, which means its emit method will do
+   * nothing.
+   *
+   * @return {Emitter} Returns this.
+   */
+  Emitter.prototype.disable = function() {
+    this._enabled = false;
+
+    return this;
+  };
+
+
+  /**
+   * This method enables the emitter.
+   *
+   * @return {Emitter} Returns this.
+   */
+  Emitter.prototype.enable = function() {
+    this._enabled = true;
+
+    return this;
+  };
+
+
+  /**
+   * Version:
+   */
+  Emitter.version = '2.1.1';
+
+
+  // Export:
+  if (typeof exports !== 'undefined') {
+    if (typeof module !== 'undefined' && module.exports)
+      exports = module.exports = Emitter;
+    exports.Emitter = Emitter;
+  } else if (typeof define === 'function' && define.amd)
+    define('emmett', [], function() {
+      return Emitter;
+    });
+  else
+    this.Emitter = Emitter;
+}).call(this);
+
+},{}],5:[function(require,module,exports){
+/**
+ * typology.js - A data validation library for Node.js and the browser,
+ *
+ * Version: 0.3.1
+ * Sources: http://github.com/jacomyal/typology
+ * Doc:     http://github.com/jacomyal/typology#readme
+ *
+ * License:
+ * --------
+ * Copyright © 2014 Alexis Jacomy (@jacomyal), Guillaume Plique (@Yomguithereal)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * The Software is provided "as is", without warranty of any kind, express or
+ * implied, including but not limited to the warranties of merchantability,
+ * fitness for a particular purpose and noninfringement. In no event shall the
+ * authors or copyright holders be liable for any claim, damages or other
+ * liability, whether in an action of contract, tort or otherwise, arising
+ * from, out of or in connection with the software or the use or other dealings
+ * in the Software.
+ */
+(function(global) {
+  'use strict';
+
+  /**
+   * Code conventions:
+   * *****************
+   *  - 80 characters max per line
+   *  - Write "__myVar" for any global private variable
+   *  - Write "_myVar" for any instance private variable
+   *  - Write "myVar" any local variable
+   */
+
+
+
+  /**
+   * PRIVATE GLOBALS:
+   * ****************
+   */
+
+  /**
+   * This object is a dictionnary that maps "[object Something]" strings to the
+   * typology form "something":
+   */
+  var __class2type = {};
+
+  /**
+   * This array is the list of every types considered native by typology:
+   */
+  var __nativeTypes = ['*'];
+
+  (function() {
+    var k,
+        className,
+        classes = [
+          'Arguments',
+          'Boolean',
+          'Number',
+          'String',
+          'Function',
+          'Array',
+          'Date',
+          'RegExp',
+          'Object'
+        ];
+
+    // Fill types
+    for (k in classes) {
+      className = classes[k];
+      __nativeTypes.push(className.toLowerCase());
+      __class2type['[object ' + className + ']'] = className.toLowerCase();
+    }
+  })();
+
+
+
+  /**
+   * CONSTRUCTOR:
+   * ************
+   */
+  function Typology(defs) {
+    /**
+     * INSTANCE PRIVATES:
+     * ******************
+     */
+
+    var _self = this;
+
+    /**
+     * This objects will contain every instance-specific custom types:
+     */
+    var _customTypes = {};
+
+    /**
+     * This function will recursively scan an object to check wether or not it
+     * matches a given type. It will return null if it matches, and an Error
+     * object else.
+     *
+     * Examples:
+     * *********
+     * 1. When the type matches:
+     *  > _scan('abc', 'string');
+     *  will return null.
+     *
+     * 2. When a top-level type does not match:
+     *  > _scan('abc', 'number');
+     *  will return an Error object with the following information:
+     *   - message: Expected a "number" but found a "string".
+     *
+     * 3. When a sub-object type does not its type:
+     *  > _scan({ a: 'abc' }, { a: 'number' });
+     *  will return an Error object with the following information:
+     *   - message: Expected a "number" but found a "string".
+     *   - path: [ 'a' ]
+     *
+     * 4. When a deep sub-object type does not its type:
+     *  > _scan({ a: [ 123, 'abc' ] }, { a: ['number'] });
+     *  will return an Error object with the following information:
+     *   - message: Expected a "number" but found a "string".
+     *   - path: [ 'a', 1 ]
+     *
+     * 5. When a required key is missing:
+     *  > _scan({}, { a: 'number' });
+     *  will return an Error object with the following information:
+     *   - message: Expected a "number" but found a "undefined".
+     *   - path: [ 'a' ]
+     *
+     * 6. When an unexpected key is present:
+     *  > _scan({ a: 123, b: 456 }, { a: 'number' });
+     *  will return an Error object with the following information:
+     *   - message: Unexpected key "b".
+     *
+     * @param  {*}      obj  The value to validate.
+     * @param  {type}   type The type.
+     * @return {?Error}      Returns null or an Error object.
+     */
+    function _scan(obj, type) {
+      var a,
+          i,
+          l,
+          k,
+          error,
+          subError,
+          hasStar,
+          hasTypeOf,
+          optional = false,
+          exclusive = false,
+          typeOf = _self.get(obj);
+
+      if (_self.get(type) === 'string') {
+        a = type.replace(/^[\?\!]/, '').split(/\|/);
+        l = a.length;
+        for (i = 0; i < l; i++)
+          if (__nativeTypes.indexOf(a[i]) < 0 && !(a[i] in _customTypes))
+            throw new Error('Invalid type.');
+
+        if (type.match(/^\?/))
+          optional = true;
+
+        if (type.replace(/^\?/, '').match(/^\!/))
+          exclusive = true;
+
+        if (exclusive && optional)
+          throw new Error('Invalid type.');
+
+        for (i in a)
+          if (_customTypes[a[i]])
+            if (
+              (typeof _customTypes[a[i]].type === 'function') ?
+                (_customTypes[a[i]].type.call(_self, obj) === true) :
+                !_scan(obj, _customTypes[a[i]].type)
+            ) {
+              if (exclusive) {
+                error = new Error();
+                error.message = 'Expected a "' + type + '" but found a ' +
+                                '"' + a[i] + '".';
+              error.expected = type;
+              error.type = a[i];
+              error.value = obj;
+                return error;
+              } else
+                return null;
+            }
+
+        if (obj === null || obj === undefined) {
+          if (!exclusive && !optional) {
+            error = new Error();
+            error.message = 'Expected a "' + type + '" but found a ' +
+                            '"' + typeOf + '".';
+            error.expected = type;
+            error.type = typeOf;
+            error.value = obj;
+            return error;
+          } else
+            return null;
+
+        } else {
+          hasStar = ~a.indexOf('*');
+          hasTypeOf = ~a.indexOf(typeOf);
+          if (exclusive && (hasStar || hasTypeOf)) {
+            error = new Error();
+            error.message = 'Expected a "' + type + '" but found a ' +
+                            '"' + (hasTypeOf ? typeOf : '*') + '".';
+            error.type = hasTypeOf ? typeOf : '*';
+            error.expected = type;
+            error.value = obj;
+            return error;
+
+          } else if (!exclusive && !(hasStar || hasTypeOf)) {
+            error = new Error();
+            error.message = 'Expected a "' + type + '" but found a ' +
+                            '"' + typeOf + '".';
+            error.expected = type;
+            error.type = typeOf;
+            error.value = obj;
+            return error;
+
+          } else
+            return null;
+        }
+
+      } else if (_self.get(type) === 'object') {
+        if (typeOf !== 'object') {
+          error = new Error();
+          error.message = 'Expected an object but found a "' + typeOf + '".';
+          error.expected = type;
+          error.type = typeOf;
+          error.value = obj;
+          return error;
+        }
+
+        for (k in type)
+          if ((subError = _scan(obj[k], type[k]))) {
+            error = subError;
+            error.path = error.path ?
+              [k].concat(error.path) :
+              [k];
+            return error;
+          }
+
+        for (k in obj)
+          if (type[k] === undefined) {
+            error = new Error();
+            error.message = 'Unexpected key "' + k + '".';
+            error.type = typeOf;
+            error.value = obj;
+            return error;
+          }
+
+        return null;
+
+      } else if (_self.get(type) === 'array') {
+        if (type.length !== 1)
+          throw new Error('Invalid type.');
+
+        if (typeOf !== 'array') {
+          error = new Error();
+          error.message = 'Expected an array but found a "' + typeOf + '".';
+          error.expected = type;
+          error.type = typeOf;
+          error.value = obj;
+          return error;
+        }
+
+        l = obj.length;
+        for (i = 0; i < l; i++)
+          if ((subError = _scan(obj[i], type[0]))) {
+            error = subError;
+            error.path = error.path ?
+              [i].concat(error.path) :
+              [i];
+            return error;
+          }
+
+        return null;
+      } else
+        throw new Error('Invalid type.');
+    }
+
+
+
+    /**
+     * INSTANCE METHODS:
+     * *****************
+     */
+
+    /**
+     * This method registers a custom type into the Typology instance. A type
+     * is registered under a unique name, and is described by an object (like
+     * classical C structures) or a function.
+     *
+     * Variant 1:
+     * **********
+     * > types.add('user', { id: 'string', name: '?string' });
+     *
+     * @param  {string}   id   The unique id of the type.
+     * @param  {object}   type The corresponding structure.
+     * @return {Typology}      Returns this.
+     *
+     * Variant 2:
+     * **********
+     * > types.add('integer', function(value) {
+     * >   return typeof value === 'number' && value === value | 0;
+     * > });
+     *
+     * @param  {string}   id   The unique id of the type.
+     * @param  {function} type The function validating the type.
+     * @return {Typology}      Returns this.
+     *
+     * Variant 3:
+     * **********
+     * > types.add({
+     * >   id: 'user',
+     * >   type: { id: 'string', name: '?string' }
+     * > });
+     *
+     * > types.add({
+     * >   id: 'integer',
+     * >   type: function(value) {
+     * >     return typeof value === 'number' && value === value | 0;
+     * >   }
+     * > });
+     *
+     * @param  {object}   specs An object describing fully the type.
+     * @return {Typology}       Returns this.
+     *
+     * Recognized parameters:
+     * **********************
+     * Here is the exhaustive list of every accepted parameters in the specs
+     * object:
+     *
+     *   {string}          id    The unique id of the type.
+     *   {function|object} type  The function or the structure object
+     *                           validating the type.
+     *   {?[string]}       proto Eventually an array of ids of types that are
+     *                           referenced in the structure but do not exist
+     *                           yet.
+     */
+    this.add = function(a1, a2) {
+      var o,
+          k,
+          a,
+          id,
+          tmp,
+          type;
+
+      // Polymorphism:
+      if (arguments.length === 1) {
+        if (this.get(a1) === 'object') {
+          o = a1;
+          id = o.id;
+          type = o.type;
+        } else
+          throw new Error('If types.add is called with one argument, ' +
+                          'this one has to be an object.');
+      } else if (arguments.length === 2) {
+        if (typeof a1 !== 'string' || !a1)
+          throw new Error('If types.add is called with more than one ' +
+                          'argument, the first one must be the string id.');
+        else
+          id = a1;
+
+        type = a2;
+      } else
+        throw new Error('types.add has to be called ' +
+                        'with one or two arguments.');
+
+      if (this.get(id) !== 'string' || id.length === 0)
+        throw new Error('A type requires an string id.');
+
+      if (_customTypes[id] !== undefined && _customTypes[id] !== 'proto')
+        throw new Error('The type "' + id + '" already exists.');
+
+      if (~__nativeTypes.indexOf(id))
+        throw new Error('"' + id + '" is a reserved type name.');
+
+      _customTypes[id] = 1;
+
+      // Check given prototypes:
+      a = (o || {}).proto || [];
+      a = Array.isArray(a) ? a : [a];
+      tmp = {};
+      for (k in a)
+        if (_customTypes[a[k]] === undefined) {
+          _customTypes[a[k]] = 1;
+          tmp[a[k]] = 1;
+        }
+
+      if ((this.get(type) !== 'function') && !this.isValid(type))
+        throw new Error('A type requires a valid definition. ' +
+                        'This one can be a preexistant type or else ' +
+                        'a function testing given objects.');
+
+      // Effectively add the type:
+      _customTypes[id] = (o === undefined) ?
+        {
+          id: id,
+          type: type
+        } :
+        {};
+
+      if (o !== undefined)
+        for (k in o)
+          _customTypes[id][k] = o[k];
+
+      // Delete prototypes:
+      for (k in tmp)
+        if (k !== id)
+          delete _customTypes[k];
+
+      return this;
+    };
+
+    /**
+     * This method returns true if a custom type is already registered in this
+     * instance under the given key.
+     *
+     * @param  {string}  key A type name.
+     * @return {boolean}     Returns true if the key is registered.
+     */
+    this.has = function(key) {
+      return !!_customTypes[key];
+    };
+
+    /**
+     * This method returns the native type of a given value.
+     *
+     * Examples:
+     * *********
+     * > types.get({ a: 1 }); // returns "object"
+     * > types.get('abcde');  // returns "string"
+     * > types.get(1234567);  // returns "number"
+     * > types.get([1, 2]);   // returns "array"
+     *
+     * @param  {*}      value Anything.
+     * @return {string}       Returns the native type of the value.
+     */
+    this.get = function(obj) {
+      return (obj === null || obj === undefined) ?
+        String(obj) :
+        __class2type[Object.prototype.toString.call(obj)] || 'object';
+    };
+
+    /**
+     * This method validates some value against a given type. If the flag throws
+     * has a truthy value, then the method will throw an error instead of
+     * returning false.
+     *
+     * To know more about the error thrown, you can read the documentation of
+     * the private method _scan.
+     *
+     * Examples:
+     * *********
+     * > types.check({ a: 1 }, 'object');                      // returns true
+     * > types.check({ a: 1 }, { a: 'string' });               // returns true
+     * > types.check({ a: 1 }, { a: 'string', b: '?number' }); // returns true
+     *
+     * > types.check({ a: 1 }, { a: 'string', b: 'number' }); // returns false
+     * > types.check({ a: 1 }, { a: 'number' });              // returns false
+     * > types.check({ a: 1 }, 'array');                      // returns false
+     *
+     * > types.check({ a: 1 }, 'array', true); // throws an Error
+     *
+     * @param  {*}        value  Anything.
+     * @param  {type}     type   A valid type.
+     * @param  {?boolean} throws If true, this method will throw an error
+     *                           instead of returning false.
+     * @return {boolean}         Returns true if the value matches the type, and
+     *                           not else.
+     */
+    this.check = function(obj, type, throws) {
+      var result = _scan(obj, type);
+      if (throws && result)
+        throw result;
+      else
+        return !result;
+    };
+
+    /**
+     * This method validates a type. If the type is not referenced or is not
+     * valid, it will return false.
+     *
+     * To know more about that function, don't hesitate to read the related
+     * unit tests.
+     *
+     * Examples:
+     * *********
+     * > types.isValid('string');        // returns true
+     * > types.isValid('?string');       // returns true
+     * > types.isValid('!string');       // returns true
+     * > types.isValid('string|number'); // returns true
+     * > types.isValid({ a: 'string' }); // returns true
+     * > types.isValid(['string']);      // returns true
+     *
+     * > types.isValid('!?string');                // returns false
+     * > types.isValid('myNotDefinedType');        // returns false
+     * > types.isValid(['myNotDefinedType']);      // returns false
+     * > types.isValid({ a: 'myNotDefinedType' }); // returns false
+     *
+     * > types.isValid('user');               // returns false
+     * > types.add('user', { id: 'string' }); // makes the type become valid
+     * > types.isValid('user');               // returns true
+     *
+     * @param  {*}       type The type to get checked.
+     * @return {boolean}      Returns true if the type is valid, and false else.
+     */
+    this.isValid = function(type) {
+      var a,
+          k,
+          i;
+
+      if (this.get(type) === 'string') {
+        a = type.replace(/^[\?\!]/, '').split(/\|/);
+        for (i in a)
+          if (__nativeTypes.indexOf(a[i]) < 0 && !(a[i] in _customTypes))
+            return false;
+        return true;
+
+      } else if (this.get(type) === 'object') {
+        for (k in type)
+          if (!this.isValid(type[k]))
+            return false;
+        return true;
+
+      } else if (this.get(type) === 'array')
+        return type.length === 1 ?
+          this.isValid(type[0]) :
+          false;
+      else
+        return false;
+    };
+
+
+
+    /**
+     * INSTANTIATION ROUTINE:
+     * **********************
+     */
+
+    // Add a type "type" to shortcut the #isValid method:
+    this.add('type', (function(v) {
+      return this.isValid(v);
+    }).bind(this));
+
+    // Add a type "primitive" to match every primitive types (including null):
+    this.add('primitive', function(v) {
+      return !v || !(v instanceof Object || typeof v === 'object');
+    });
+
+    // Adding custom types at instantiation:
+    defs = defs || {};
+    if (this.get(defs) !== 'object')
+      throw Error('Invalid argument.');
+
+    for (var k in defs)
+      this.add(k, defs[k]);
+  }
+
+
+
+  /**
+   * GLOBAL PUBLIC API:
+   * ******************
+   */
+
+  // Creating a "main" typology instance to export:
+  var types = Typology;
+  Typology.call(types);
+
+  // Version:
+  Object.defineProperty(types, 'version', {
+    value: '0.3.1'
+  });
+
+
+
+  /**
+   * EXPORT:
+   * *******
+   */
+  if (typeof exports !== 'undefined') {
+    if (typeof module !== 'undefined' && module.exports)
+      exports = module.exports = types;
+    exports.types = types;
+  } else if (typeof define === 'function' && define.amd)
+    define('typology', [], function() {
+      return types;
+    });
+  else
+    this.types = types;
+})(this);
+
+},{}],6:[function(require,module,exports){
+(function (process){
+/**
+ * Baobab Data Structure
+ * ======================
+ *
+ * A handy data tree with cursors.
+ */
+var Cursor = require('./cursor.js'),
+    EventEmitter = require('emmett'),
+    Typology = require('typology'),
+    helpers = require('./helpers.js'),
+    update = require('./update.js'),
+    merge = require('./merge.js'),
+    mixins = require('./mixins.js'),
+    defaults = require('../defaults.js'),
+    type = require('./type.js');
+
+function complexHash(type) {
+  return type + '$' +
+    (new Date()).getTime() + (''  + Math.random()).replace('0.', '');
+}
+
+/**
+ * Main Class
+ */
+function Baobab(initialData, opts) {
+  if (arguments.length < 1)
+    initialData = {};
+
+  // New keyword optional
+  if (!(this instanceof Baobab))
+    return new Baobab(initialData, opts);
+
+  if (!type.Object(initialData) && !type.Array(initialData))
+    throw Error('Baobab: invalid data.');
+
+  // Extending
+  EventEmitter.call(this);
+
+  // Merging defaults
+  this.options = helpers.shallowMerge(defaults, opts);
+  this._cloner = this.options.cloningFunction || helpers.deepClone;
+
+  // Privates
+  this._futureUpdate = {};
+  this._shouldUpdate = false;
+  this._history = [];
+  this._cursors = {};
+
+  // Internal typology
+  this.typology = this.options.typology ?
+    (this.options.typology instanceof Typology ?
+      this.options.typology :
+      new Typology(this.options.typology)) :
+    new Typology();
+
+  // Internal validation
+  this.validate = this.options.validate || null;
+
+  if (this.validate)
+    try {
+      this.typology.check(initialData, this.validate, true);
+    }
+    catch (e) {
+      e.message = '/' + e.path.join('/') + ': ' + e.message;
+      throw e;
+    }
+
+  // Properties
+  this.data = this._cloner(initialData);
+
+  // Mixin
+  this.mixin = mixins.baobab(this);
+}
+
+helpers.inherits(Baobab, EventEmitter);
+
+/**
+ * Private prototype
+ */
+Baobab.prototype._stack = function(spec) {
+  var self = this;
+
+  if (!type.Object(spec))
+    throw Error('Baobab.update: wrong specification.');
+
+  this._futureUpdate = merge(spec, this._futureUpdate);
+
+  // Should we let the user commit?
+  if (!this.options.autoCommit)
+    return this;
+
+  // Should we update synchronously?
+  if (!this.options.asynchronous)
+    return this.commit();
+
+  // Updating asynchronously
+  if (!this._shouldUpdate) {
+    this._shouldUpdate = true;
+    process.nextTick(function() {
+      if (self._shouldUpdate)
+        self.commit();
+    });
+  }
+
+  return this;
+};
+
+Baobab.prototype._archive = function() {
+  if (this.options.maxHistory <= 0)
+    return;
+
+  var record = {
+    data: this._cloner(this.data)
+  };
+
+  // Replacing
+  if (this._history.length === this.options.maxHistory) {
+    this._history.pop();
+  }
+  this._history.unshift(record);
+
+  return record;
+};
+
+/**
+ * Prototype
+ */
+Baobab.prototype.commit = function(referenceRecord) {
+  var self = this,
+      log;
+
+  if (referenceRecord) {
+
+    // Override
+    this.data = referenceRecord.data;
+    log = referenceRecord.log;
+  }
+  else {
+
+    // Shifting root reference
+    if (this.options.shiftReferences)
+      this.data = helpers.shallowClone(this.data);
+
+    // Applying modification (mutation)
+    var record = this._archive();
+    log = update(this.data, this._futureUpdate, this.options);
+
+    if (record)
+      record.log = log;
+  }
+
+  if (this.validate) {
+    var errors = [],
+        l = log.length,
+        d,
+        i;
+
+    for (i = 0; i < l; i++) {
+      d = helpers.getIn(this.validate, log[i]);
+
+      if (!d)
+        continue;
+
+      try {
+        this.typology.check(this.get(log[i]), d, true);
+      }
+      catch (e) {
+        e.path = log[i].concat((e.path || []));
+        errors.push(e);
+      }
+    }
+
+    if (errors.length)
+      this.emit('invalid', {errors: errors});
+  }
+
+  // Baobab-level update event
+  this.emit('update', {
+    log: log
+  });
+
+  // Resetting
+  this._futureUpdate = {};
+  this._shouldUpdate = false;
+
+  return this;
+};
+
+Baobab.prototype.select = function(path) {
+  if (arguments.length > 1)
+    path = helpers.arrayOf(arguments);
+
+  if (!type.Path(path))
+    throw Error('Baobab.select: invalid path.');
+
+  // Casting to array
+  path = !type.Array(path) ? [path] : path;
+
+  // Complex path?
+  var complex = type.ComplexPath(path);
+
+  var solvedPath;
+
+  if (complex)
+    solvedPath = helpers.solvePath(this.data, path);
+
+  // Registering a new cursor or giving the already existing one for path
+  if (!this.options.cursorSingletons) {
+    return new Cursor(this, path);
+  }
+  else {
+    var hash = path.map(function(step) {
+      if (type.Function(step))
+        return complexHash('fn');
+      else if (type.Object(step))
+        return complexHash('ob');
+      else
+        return step;
+    }).join('λ');
+
+    if (!this._cursors[hash]) {
+      var cursor = new Cursor(this, path, solvedPath);
+      this._cursors[hash] = cursor;
+      return cursor;
+    }
+    else {
+      return this._cursors[hash];
+    }
+  }
+};
+
+Baobab.prototype.reference = function(path) {
+  var data;
+
+  if (arguments.length > 1)
+    path = helpers.arrayOf(arguments);
+
+  if (!type.Path(path))
+    throw Error('Baobab.get: invalid path.');
+
+  return helpers.getIn(
+    this.data, type.String(path) || type.Number(path) ? [path] : path
+  );
+};
+
+Baobab.prototype.get = function() {
+  var ref = this.reference.apply(this, arguments);
+
+  return this.options.clone ? this._cloner(ref) : ref;
+};
+
+Baobab.prototype.clone = function(path) {
+  return this._cloner(this.reference.apply(this, arguments));
+};
+
+Baobab.prototype.set = function(key, val) {
+
+  if (arguments.length < 2)
+    throw Error('Baobab.set: expects a key and a value.');
+
+  var spec = {};
+  spec[key] = {$set: val};
+
+  return this.update(spec);
+};
+
+Baobab.prototype.update = function(spec) {
+  return this._stack(spec);
+};
+
+Baobab.prototype.hasHistory = function() {
+  return !!this._history.length;
+};
+
+Baobab.prototype.getHistory = function() {
+  return this._history;
+};
+
+Baobab.prototype.undo = function() {
+  if (!this.hasHistory())
+    throw Error('Baobab.undo: no history recorded, cannot undo.');
+
+  var lastRecord = this._history.shift();
+  this.commit(lastRecord);
+};
+
+Baobab.prototype.release = function() {
+  this.kill();
+  delete this.data;
+  delete this._futureUpdate;
+  delete this._history;
+
+  // Releasing cursors
+  for (var k in this._cursors)
+    this._cursors[k].release();
+  delete this._cursors;
+};
+
+/**
+ * Output
+ */
+Baobab.prototype.toJSON = function() {
+  return this.reference();
+};
+
+/**
+ * Export
+ */
+module.exports = Baobab;
+
+}).call(this,require('_process'))
+},{"../defaults.js":1,"./cursor.js":8,"./helpers.js":9,"./merge.js":10,"./mixins.js":11,"./type.js":12,"./update.js":13,"_process":3,"emmett":4,"typology":5}],7:[function(require,module,exports){
+/**
+ * Baobab Cursor Combination
+ * ==========================
+ *
+ * A useful abstraction dealing with cursor's update logical combinations.
+ */
+var EventEmitter = require('emmett'),
+    helpers = require('./helpers.js'),
+    type = require('./type.js');
+
+/**
+ * Utilities
+ */
+function bindCursor(c, cursor) {
+  cursor.on('update', c.cursorListener);
+}
+
+/**
+ * Main Class
+ */
+function Combination(operator /*, &cursors */) {
+  var self = this;
+
+  // Safeguard
+  if (arguments.length < 2)
+    throw Error('baobab.Combination: not enough arguments.');
+
+  var first = arguments[1],
+      rest = helpers.arrayOf(arguments).slice(2);
+
+  if (first instanceof Array) {
+    rest = first.slice(1);
+    first = first[0];
+  }
+
+  if (!type.Cursor(first))
+    throw Error('baobab.Combination: argument should be a cursor.');
+
+  if (operator !== 'or' && operator !== 'and')
+    throw Error('baobab.Combination: invalid operator.');
+
+  // Extending event emitter
+  EventEmitter.call(this);
+
+  // Properties
+  this.cursors = [first];
+  this.operators = [];
+  this.root = first.root;
+
+  // State
+  this.updates = new Array(this.cursors.length);
+
+  // Listeners
+  this.cursorListener = function() {
+    self.updates[self.cursors.indexOf(this)] = true;
+  };
+
+  this.treeListener = function() {
+    var shouldFire = self.updates[0],
+        i,
+        l;
+
+    for (i = 1, l = self.cursors.length; i < l; i++) {
+      shouldFire = self.operators[i - 1] === 'or' ?
+        shouldFire || self.updates[i] :
+        shouldFire && self.updates[i];
+    }
+
+    if (shouldFire)
+      self.emit('update');
+
+    // Waiting for next update
+    self.updates = new Array(self.cursors.length);
+  };
+
+  // Initial bindings
+  this.root.on('update', this.treeListener);
+  bindCursor(this, first);
+
+  // Attaching any other passed cursors
+  rest.forEach(function(cursor) {
+    this[operator](cursor);
+  }, this);
+}
+
+helpers.inherits(Combination, EventEmitter);
+
+/**
+ * Prototype
+ */
+function makeOperator(operator) {
+  Combination.prototype[operator] = function(cursor) {
+
+    // Safeguard
+    if (!type.Cursor(cursor))
+      throw Error('baobab.Combination.' + operator + ': argument should be a cursor.');
+
+    if (~this.cursors.indexOf(cursor))
+      throw Error('baobab.Combination.' + operator + ': cursor already in combination.');
+
+    this.cursors.push(cursor);
+    this.operators.push(operator);
+    this.updates.length++;
+    bindCursor(this, cursor);
+
+    return this;
+  };
+}
+
+makeOperator('or');
+makeOperator('and');
+
+Combination.prototype.release = function() {
+
+  // Dropping own listeners
+  this.kill();
+
+  // Dropping cursors listeners
+  this.cursors.forEach(function(cursor) {
+    cursor.off('update', this.cursorListener);
+  }, this);
+
+  // Dropping tree listener
+  this.root.off('update', this.treeListener);
+
+  // Cleaning
+  this.cursors = null;
+  this.operators = null;
+  this.root = null;
+  this.updates = null;
+};
+
+/**
+ * Exporting
+ */
+module.exports = Combination;
+
+},{"./helpers.js":9,"./type.js":12,"emmett":4}],8:[function(require,module,exports){
+/**
+ * Baobab Cursor Abstraction
+ * ==========================
+ *
+ * Nested selection into a baobab tree.
+ */
+var EventEmitter = require('emmett'),
+    Combination = require('./combination.js'),
+    mixins = require('./mixins.js'),
+    helpers = require('./helpers.js'),
+    type = require('./type.js');
+
+/**
+ * Main Class
+ */
+function Cursor(root, path, solvedPath) {
+  var self = this;
+
+  // Extending event emitter
+  EventEmitter.call(this);
+
+  // Enforcing array
+  path = path || [];
+
+  // Properties
+  this.root = root;
+  this.path = path;
+  this.relevant = this.reference() !== undefined;
+
+  // Complex path?
+  this.complexPath = !!solvedPath;
+  this.solvedPath = this.complexPath ? solvedPath : this.path;
+
+  // Root listeners
+  this.updateHandler = function(e) {
+    var log = e.data.log,
+        shouldFire = false,
+        c, p, l, m, i, j;
+
+    // Solving path if needed
+    if (self.complexPath)
+      self.solvedPath = helpers.solvePath(self.root.data, self.path);
+
+    // If no handlers are attached, we stop
+    if (!this._handlers.update.length && !this._handlersAll.length)
+      return;
+
+    // If selector listens at root, we fire
+    if (!self.path.length)
+      return self.emit('update');
+
+    // Checking update log to see whether the cursor should update.
+    root:
+    for (i = 0, l = log.length; i < l; i++) {
+      c = log[i];
+
+      for (j = 0, m = c.length; j < m; j++) {
+        p = c[j];
+
+        // If path is not relevant to us, we break
+        if (p !== '' + self.solvedPath[j])
+          break;
+
+        // If we reached last item and we are relevant, we fire
+        if (j + 1 === m || j + 1 === self.solvedPath.length) {
+          shouldFire = true;
+          break root;
+        }
+      }
+    }
+
+    // Handling relevancy
+    var data = self.reference() !== undefined;
+
+    if (self.relevant) {
+      if (data && shouldFire) {
+        self.emit('update');
+      }
+      else if (!data) {
+        self.emit('irrelevant');
+        self.relevant = false;
+      }
+    }
+    else {
+      if (data && shouldFire) {
+        self.emit('relevant');
+        self.emit('update');
+        self.relevant = true;
+      }
+    }
+  };
+
+  // Listening
+  this.root.on('update', this.updateHandler);
+
+  // Making mixin
+  this.mixin = mixins.cursor(this);
+}
+
+helpers.inherits(Cursor, EventEmitter);
+
+/**
+ * Private prototype
+ */
+Cursor.prototype._stack = function(spec) {
+  this.root._stack(helpers.pathObject(this.solvedPath, spec));
+  return this;
+};
+
+/**
+ * Predicates
+ */
+Cursor.prototype.isRoot = function() {
+  return !this.path.length;
+};
+
+Cursor.prototype.isLeaf = function() {
+  return type.Primitive(this.reference());
+};
+
+Cursor.prototype.isBranch = function() {
+  return !this.isLeaf() && !this.isRoot();
+};
+
+/**
+ * Traversal
+ */
+Cursor.prototype.select = function(path) {
+  if (arguments.length > 1)
+    path = helpers.arrayOf(arguments);
+
+  if (!type.Path(path))
+    throw Error('baobab.Cursor.select: invalid path.');
+  return this.root.select(this.path.concat(path));
+};
+
+Cursor.prototype.up = function() {
+  if (this.solvedPath && this.solvedPath.length)
+    return this.root.select(this.path.slice(0, -1));
+  else
+    return null;
+};
+
+Cursor.prototype.left = function() {
+  var last = +this.solvedPath[this.solvedPath.length - 1];
+
+  if (isNaN(last))
+    throw Error('baobab.Cursor.left: cannot go left on a non-list type.');
+
+  return last ?
+    this.root.select(this.solvedPath.slice(0, -1).concat(last - 1)) :
+    null;
+};
+
+Cursor.prototype.leftmost = function() {
+  var last = +this.solvedPath[this.solvedPath.length - 1];
+
+  if (isNaN(last))
+    throw Error('baobab.Cursor.leftmost: cannot go left on a non-list type.');
+
+  return this.root.select(this.solvedPath.slice(0, -1).concat(0));
+};
+
+Cursor.prototype.right = function() {
+  var last = +this.solvedPath[this.solvedPath.length - 1];
+
+  if (isNaN(last))
+    throw Error('baobab.Cursor.right: cannot go right on a non-list type.');
+
+  if (last + 1 === this.up().reference().length)
+    return null;
+
+  return this.root.select(this.solvedPath.slice(0, -1).concat(last + 1));
+};
+
+Cursor.prototype.rightmost = function() {
+  var last = +this.solvedPath[this.solvedPath.length - 1];
+
+  if (isNaN(last))
+    throw Error('baobab.Cursor.right: cannot go right on a non-list type.');
+
+  var list = this.up().reference();
+
+  return this.root.select(this.solvedPath.slice(0, -1).concat(list.length - 1));
+};
+
+Cursor.prototype.down = function() {
+  var last = +this.solvedPath[this.solvedPath.length - 1];
+
+  if (!(this.reference() instanceof Array))
+    return null;
+
+  return this.root.select(this.solvedPath.concat(0));
+};
+
+/**
+ * Access
+ */
+Cursor.prototype.get = function(path) {
+  if (arguments.length > 1)
+    path = helpers.arrayOf(arguments);
+
+  if (type.Step(path))
+    return this.root.get(this.solvedPath.concat(path));
+  else
+    return this.root.get(this.solvedPath);
+};
+
+Cursor.prototype.reference = function(path) {
+  if (arguments.length > 1)
+    path = helpers.arrayOf(arguments);
+
+  if (type.Step(path))
+    return this.root.reference(this.solvedPath.concat(path));
+  else
+    return this.root.reference(this.solvedPath);
+};
+
+Cursor.prototype.clone = function(path) {
+  if (arguments.length > 1)
+    path = helpers.arrayOf(arguments);
+
+  if (type.Step(path))
+    return this.root.clone(this.solvedPath.concat(path));
+  else
+    return this.root.clone(this.solvedPath);
+};
+
+/**
+ * Update
+ */
+Cursor.prototype.set = function(key, value) {
+  if (arguments.length < 2)
+    throw Error('baobab.Cursor.set: expecting at least key/value.');
+
+  var spec = {};
+  spec[key] = {$set: value};
+  return this.update(spec);
+};
+
+Cursor.prototype.edit = function(value) {
+  return this.update({$set: value});
+};
+
+Cursor.prototype.apply = function(fn) {
+  if (typeof fn !== 'function')
+    throw Error('baobab.Cursor.apply: argument is not a function.');
+
+  return this.update({$apply: fn});
+};
+
+// TODO: maybe composing should be done here rather than in the merge
+Cursor.prototype.thread = function(fn) {
+  if (typeof fn !== 'function')
+    throw Error('baobab.Cursor.thread: argument is not a function.');
+
+  return this.update({$thread: fn});
+};
+
+// TODO: consider dropping the ahead testing
+Cursor.prototype.push = function(value) {
+  if (!(this.reference() instanceof Array))
+    throw Error('baobab.Cursor.push: trying to push to non-array value.');
+
+  if (arguments.length > 1)
+    return this.update({$push: helpers.arrayOf(arguments)});
+  else
+    return this.update({$push: value});
+};
+
+Cursor.prototype.unshift = function(value) {
+  if (!(this.reference() instanceof Array))
+    throw Error('baobab.Cursor.push: trying to push to non-array value.');
+
+  if (arguments.length > 1)
+    return this.update({$unshift: helpers.arrayOf(arguments)});
+  else
+    return this.update({$unshift: value});
+};
+
+Cursor.prototype.merge = function(o) {
+  if (!type.Object(o))
+    throw Error('baobab.Cursor.merge: trying to merge a non-object.');
+
+  if (!type.Object(this.reference()))
+    throw Error('baobab.Cursor.merge: trying to merge into a non-object.');
+
+  this.update({$merge: o});
+};
+
+Cursor.prototype.update = function(spec) {
+  return this._stack(spec);
+};
+
+/**
+ * Combination
+ */
+Cursor.prototype.or = function(otherCursor) {
+  return new Combination('or', this, otherCursor);
+};
+
+Cursor.prototype.and = function(otherCursor) {
+  return new Combination('and', this, otherCursor);
+};
+
+/**
+ * Releasing
+ */
+Cursor.prototype.release = function() {
+  this.root.off('update', this.updateHandler);
+  this.root = null;
+  this.kill();
+};
+
+/**
+ * Output
+ */
+Cursor.prototype.toJSON = function() {
+  return this.reference();
+};
+
+type.Cursor = function (value) {
+  return value instanceof Cursor;
+};
+
+/**
+ * Export
+ */
+module.exports = Cursor;
+
+},{"./combination.js":7,"./helpers.js":9,"./mixins.js":11,"./type.js":12,"emmett":4}],9:[function(require,module,exports){
+/**
+ * Baobab Helpers
+ * ===============
+ *
+ * Miscellaneous helper functions.
+ */
+var type = require('./type.js');
+
+// Make a real array of an array-like object
+function arrayOf(o) {
+  return Array.prototype.slice.call(o);
+}
+
+// Shallow merge
+function shallowMerge(o1, o2) {
+  var o = {},
+      k;
+
+  for (k in o1) o[k] = o1[k];
+  for (k in o2) o[k] = o2[k];
+
+  return o;
+}
+
+// Shallow clone
+function shallowClone(item) {
+  if (!item || !(item instanceof Object))
+    return item;
+
+  // Array
+  if (type.Array(item))
+    return item.slice(0);
+
+  // Date
+  if (type.Date(item))
+    return new Date(item.getTime());
+
+  // Object
+  if (type.Object(item)) {
+    var k, o = {};
+    for (k in item)
+      o[k] = item[k];
+    return o;
+  }
+
+  return item;
+}
+
+// Deep clone
+function deepClone(item) {
+  if (!item || !(item instanceof Object))
+    return item;
+
+  // Array
+  if (type.Array(item)) {
+    var i, l, a = [];
+    for (i = 0, l = item.length; i < l; i++)
+      a.push(deepClone(item[i]));
+    return a;
+  }
+
+  // Date
+  if (type.Date(item))
+    return new Date(item.getTime());
+
+  // Object
+  if (type.Object(item)) {
+    var k, o = {};
+    for (k in item)
+      o[k] = deepClone(item[k]);
+    return o;
+  }
+
+  return item;
+}
+
+// Simplistic composition
+function compose(fn1, fn2) {
+  return function(arg) {
+    return fn2(fn1(arg));
+  };
+}
+
+// Get first item matching predicate in list
+function first(a, fn) {
+  var i, l;
+  for (i = 0, l = a.length; i < l; i++) {
+    if (fn(a[i]))
+      return a[i];
+  }
+  return;
+}
+
+function index(a, fn) {
+  var i, l;
+  for (i = 0, l = a.length; i < l; i++) {
+    if (fn(a[i]))
+      return i;
+  }
+  return -1;
+}
+
+// Compare object to spec
+function compare(object, spec) {
+  var ok = true,
+      k;
+
+  for (k in spec) {
+    if (type.Object(spec[k])) {
+      ok = ok && compare(object[k]);
+    }
+    else if (type.Array(spec[k])) {
+      ok = ok && !!~spec[k].indexOf(object[k]);
+    }
+    else {
+      if (object[k] !== spec[k])
+        return false;
+    }
+  }
+
+  return ok;
+}
+
+function firstByComparison(object, spec) {
+  return first(object, function(e) {
+    return compare(e, spec);
+  });
+}
+
+function indexByComparison(object, spec) {
+  return index(object, function(e) {
+    return compare(e, spec);
+  });
+}
+
+// Retrieve nested objects
+function getIn(object, path) {
+  path = path || [];
+
+  var c = object,
+      i,
+      l;
+
+  for (i = 0, l = path.length; i < l; i++) {
+    if (!c)
+      return;
+
+    if (typeof path[i] === 'function') {
+      if (!type.Array(c))
+        return;
+
+      c = first(c, path[i]);
+    }
+    else if (typeof path[i] === 'object') {
+      if (!type.Array(c))
+        return;
+
+      c = firstByComparison(c, path[i]);
+    }
+    else {
+      c = c[path[i]];
+    }
+  }
+
+  return c;
+}
+
+// Solve a complex path
+function solvePath(object, path) {
+  var solvedPath = [],
+      c = object,
+      idx,
+      i,
+      l;
+
+  for (i = 0, l = path.length; i < l; i++) {
+    if (!c)
+      return null;
+
+    if (typeof path[i] === 'function') {
+      if (!type.Array(c))
+        return;
+
+      idx = index(c, path[i]);
+      solvedPath.push(idx);
+      c = c[idx];
+    }
+    else if (typeof path[i] === 'object') {
+      if (!type.Array(c))
+        return;
+
+      idx = indexByComparison(c, path[i]);
+      solvedPath.push(idx);
+      c = c[idx];
+    }
+    else {
+      solvedPath.push(path[i]);
+      c = c[path[i]];
+    }
+  }
+
+  return solvedPath;
+}
+
+// Return a fake object relative to the given path
+function pathObject(path, spec) {
+  var l = path.length,
+      o = {},
+      c = o,
+      i;
+
+  if (!l)
+    o = spec;
+
+  for (i = 0; i < l; i++) {
+    c[path[i]] = (i + 1 === l) ? spec : {};
+    c = c[path[i]];
+  }
+
+  return o;
+}
+
+function inherits(ctor, superCtor) {
+  ctor.super_ = superCtor;
+  var TempCtor = function () {};
+  TempCtor.prototype = superCtor.prototype;
+  ctor.prototype = new TempCtor();
+  ctor.prototype.constructor = ctor;
+}
+
+module.exports = {
+  arrayOf: arrayOf,
+  deepClone: deepClone,
+  shallowClone: shallowClone,
+  shallowMerge: shallowMerge,
+  compose: compose,
+  getIn: getIn,
+  inherits: inherits,
+  pathObject: pathObject,
+  solvePath: solvePath
+};
+
+},{"./type.js":12}],10:[function(require,module,exports){
+/**
+ * Baobab Merge
+ * =============
+ *
+ * A function used to merge updates in the stack.
+ */
+var helpers = require('./helpers.js'),
+    type = require('./type.js');
+
+// Helpers
+function hasKey(o, key) {
+  return key in (o || {});
+}
+
+function conflict(a, b, key) {
+  return hasKey(a, key) && hasKey(b, key);
+}
+
+// Main function
+function merge() {
+  var res = {},
+      current,
+      next,
+      l = arguments.length,
+      i,
+      k;
+
+  for (i = l - 1; i >= 0; i--) {
+
+    // Upper $set/$apply... and conflicts
+    // When solving conflicts, here is the priority to apply:
+    // -- 1) $set
+    // -- 2) $merge
+    // -- 3) $apply
+    // -- 4) $chain
+    if (arguments[i].$set) {
+      delete res.$apply;
+      delete res.$merge;
+      res.$set = arguments[i].$set;
+      continue;
+    }
+    else if (arguments[i].$merge) {
+      delete res.$set;
+      delete res.$apply;
+      res.$merge = arguments[i].$merge;
+      continue;
+    }
+    else if (arguments[i].$apply){
+      delete res.$set;
+      delete res.$merge;
+      res.$apply = arguments[i].$apply;
+      continue;
+    }
+    else if (arguments[i].$chain) {
+      delete res.$set;
+      delete res.$merge;
+
+      if (res.$apply)
+        res.$apply = helpers.compose(res.$apply, arguments[i].$chain);
+      else
+        res.$apply = arguments[i].$chain;
+      continue;
+    }
+
+    for (k in arguments[i]) {
+      current = res[k];
+      next = arguments[i][k];
+
+      if (current && type.Object(next)) {
+
+        // $push conflict
+        if (conflict(current, next, '$push')) {
+          if (type.Array(current.$push))
+            current.$push = current.$push.concat(next.$push);
+          else
+            current.$push = [current.$push].concat(next.$push);
+        }
+
+        // $unshift conflict
+        else if (conflict(current, next, '$unshift')) {
+          if (type.Array(next.$unshift))
+            current.$unshift = next.$unshift.concat(current.$unshift);
+          else
+            current.$unshift = [next.$unshift].concat(current.$unshift);
+        }
+
+        // No conflict
+        else {
+          res[k] = merge(next, current);
+        }
+      }
+      else {
+        res[k] = next;
+      }
+    }
+  }
+
+  return res;
+}
+
+module.exports = merge;
+
+},{"./helpers.js":9,"./type.js":12}],11:[function(require,module,exports){
+/**
+ * Baobab React Mixins
+ * ====================
+ *
+ * Compilation of react mixins designed to deal with cursors integration.
+ */
+var Combination = require('./combination.js'),
+    type = require('./type.js');
+
+module.exports = {
+  baobab: function(baobab) {
+    return {
+
+      // Run Baobab mixin first to allow mixins to access cursors
+      mixins: [{
+        getInitialState: function() {
+
+          // Binding baobab to instance
+          this.tree = baobab;
+
+          // Is there any cursors to create?
+          if (!this.cursor && !this.cursors)
+            return {};
+
+          // Is there conflicting definitions?
+          if (this.cursor && this.cursors)
+            throw Error('baobab.mixin: you cannot have both ' +
+                        '`component.cursor` and `component.cursors`. Please ' +
+                        'make up your mind.');
+
+          // Type
+          this.__type = null;
+
+          // Making update handler
+          this.__updateHandler = (function() {
+            this.setState(this.__getCursorData());
+          }).bind(this);
+
+          if (this.cursor) {
+            if (!type.MixinCursor(this.cursor))
+              throw Error('baobab.mixin.cursor: invalid data (cursor, string or array).');
+
+            if (!type.Cursor(this.cursor))
+              this.cursor = baobab.select(this.cursor);
+
+            this.__getCursorData = (function() {
+              return {cursor: this.cursor.get()};
+            }).bind(this);
+            this.__type = 'single';
+          }
+          else if (this.cursors) {
+            if (['object', 'array'].indexOf(type(this.cursors)) === -1)
+              throw Error('baobab.mixin.cursor: invalid data (object or array).');
+
+            if (type.Array(this.cursors)) {
+              this.cursors = this.cursors.map(function(path) {
+                return type.Cursor(path) ? path : baobab.select(path);
+              });
+
+              this.__getCursorData = (function() {
+                return {cursors: this.cursors.map(function(cursor) {
+                  return cursor.get();
+                })};
+              }).bind(this);
+              this.__type = 'array';
+            }
+            else {
+              for (var k in this.cursors) {
+                if (!type.Cursor(this.cursors[k]))
+                  this.cursors[k] = baobab.select(this.cursors[k]);
+              }
+
+              this.__getCursorData = (function() {
+                var d = {};
+                for (k in this.cursors)
+                  d[k] = this.cursors[k].get();
+                return {cursors: d};
+              }).bind(this);
+              this.__type = 'object';
+            }
+          }
+
+          return this.__getCursorData();
+        },
+        componentDidMount: function() {
+          if (this.__type === 'single') {
+            this.__combination = new Combination('or', [this.cursor]);
+            this.__combination.on('update', this.__updateHandler);
+          }
+          else if (this.__type === 'array') {
+            this.__combination = new Combination('or', this.cursors);
+            this.__combination.on('update', this.__updateHandler);
+          }
+          else if (this.__type === 'object') {
+            this.__combination = new Combination(
+              'or',
+              Object.keys(this.cursors).map(function(k) {
+                return this.cursors[k];
+              }, this)
+            );
+            this.__combination.on('update', this.__updateHandler);
+          }
+        },
+        componentWillUnmount: function() {
+          if (this.__combination)
+            this.__combination.release();
+        }
+      }].concat(baobab.options.mixins)
+    };
+  },
+  cursor: function(cursor) {
+    return {
+
+      // Run cursor mixin first to allow mixins to access cursors
+      mixins: [{
+        getInitialState: function() {
+
+          // Binding cursor to instance
+          this.cursor = cursor;
+
+          // Making update handler
+          this.__updateHandler = (function() {
+            this.setState({cursor: this.cursor.get()});
+          }).bind(this);
+
+          return {cursor: this.cursor.get()};
+        },
+        componentDidMount: function() {
+
+          // Listening to updates
+          this.cursor.on('update', this.__updateHandler);
+        },
+        componentWillUnmount: function() {
+
+          // Unbinding handler
+          this.cursor.off('update', this.__updateHandler);
+        }
+      }].concat(cursor.root.options.mixins)
+    };
+  }
+};
+
+},{"./combination.js":7,"./type.js":12}],12:[function(require,module,exports){
+/**
+ * Baobab Type Checking
+ * =====================
+ *
+ * Misc helpers functions used throughout the library to perform some type
+ * tests at runtime.
+ *
+ * @christianalfoni
+ */
+
+// Not reusing methods as it will just be an extra
+// call on the stack
+var type = function (value) {
+  if (Array.isArray(value)) {
+    return 'array';
+  } else if (typeof value === 'object' && value !== null) {
+    return 'object';
+  } else if (typeof value === 'string') {
+    return 'string';
+  } else if (typeof value === 'number') {
+    return 'number';
+  } else if (typeof value === 'boolean') {
+    return 'boolean';
+  } else if (typeof value === 'function') {
+    return 'function';
+  } else if (value === null) {
+    return 'null';
+  } else if (value === undefined) {
+    return 'undefined';
+  } else if (value instanceof Date) {
+    return 'date';
+  } else {
+    return 'invalid';
+  }
+};
+
+type.Array = function (value) {
+  return Array.isArray(value);
+};
+
+type.Object = function (value) {
+  return !Array.isArray(value) && typeof value === 'object' && value !== null;
+};
+
+type.String = function (value) {
+  return typeof value === 'string';
+};
+
+type.Number = function (value) {
+  return typeof value === 'number';
+};
+
+type.Boolean = function (value) {
+  return typeof value === 'boolean';
+};
+
+type.Function = function (value) {
+  return typeof value === 'function';
+};
+
+type.Primitive = function (value) {
+  return typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean';
+};
+
+type.Date = function (value) {
+  return value instanceof Date;
+};
+
+type.Step = function (value) {
+  var valueType = type(value);
+  var notValid = ['null', 'undefined', 'invalid', 'date'];
+  return notValid.indexOf(valueType) === -1;
+};
+
+// Should undefined be allowed?
+type.Path = function (value) {
+  var types = ['object', 'string', 'number', 'function', 'undefined'];
+  if (type.Array(value)) {
+    for (var x = 0; x < value.length; x++) {
+      if (types.indexOf(type(value[x])) === -1) {
+        return false;
+      }
+    }
+  } else {
+    return types.indexOf(type(value)) >= 0;
+  }
+  return true;
+
+};
+
+// string|number|array|cursor
+type.MixinCursor = function (value) {
+  var allowedValues = ['string', 'number', 'array'];
+  return allowedValues.indexOf(type(value)) >= 0 || type.Cursor(value);
+};
+
+// Already know this is an array
+type.ComplexPath = function (value) {
+  var complexTypes = ['object', 'function'];
+  for (var x = 0; x < value.length; x++) {
+    if (complexTypes.indexOf(type(value[x])) >= 0) {
+      return true;
+    }
+  }
+  return false;
+};
+
+module.exports = type;
+
+},{}],13:[function(require,module,exports){
+/**
+ * Baobab Update
+ * ==============
+ *
+ * A handy method to mutate an atom according to the given specification.
+ * Mostly inspired by http://facebook.github.io/react/docs/update.html
+ */
+var helpers = require('./helpers.js'),
+    type = require('./type.js');
+
+var COMMANDS = {};
+[
+  '$set',
+  '$push',
+  '$unshift',
+  '$apply',
+  '$merge'
+].forEach(function(c) {
+  COMMANDS[c] = true;
+});
+
+// Helpers
+function makeError(path, message) {
+  var e = new Error('precursors.update: ' + message + ' at path /' +
+                    path.toString());
+
+  e.path = path;
+  return e;
+}
+
+// Core function
+function update(target, spec, opts) {
+  opts = opts || {};
+  var log = {};
+
+  // Closure mutating the internal object
+  (function mutator(o, spec, path) {
+    path = path || [];
+
+    var hash = path.join('λ'),
+        fn,
+        h,
+        k,
+        v;
+
+    for (k in spec) {
+      if (COMMANDS[k]) {
+        v = spec[k];
+
+        // Logging update
+        log[hash] = true;
+
+        // Applying
+        switch (k) {
+          case '$push':
+            if (!type.Array(o))
+              throw makeError(path, 'using command $push to a non array');
+
+            if (!type.Array(v))
+              o.push(v);
+            else
+              o.push.apply(o, v);
+            break;
+          case '$unshift':
+            if (!type.Array(o))
+              throw makeError(path, 'using command $unshift to a non array');
+
+            if (!type.Array(v))
+              o.unshift(v);
+            else
+              o.unshift.apply(o, v);
+            break;
+        }
+      }
+      else {
+        h = hash ? hash + 'λ' + k : k;
+
+        if ('$set' in (spec[k] || {})) {
+          v = spec[k].$set;
+
+          // Logging update
+          log[h] = true;
+          o[k] = v;
+        }
+        else if ('$apply' in (spec[k] || {})) {
+          fn = spec[k].$apply;
+
+          if (typeof fn !== 'function')
+            throw makeError(path.concat(k), 'using command $apply with a non function');
+
+          // Logging update
+          log[h] = true;
+          o[k] = fn.call(null, o[k]);
+        }
+        else if ('$merge' in (spec[k] || {})) {
+          v = spec[k].$merge;
+
+          if (!type.Object(o[k]))
+            throw makeError(path.concat(k), 'using command $merge on a non-object');
+
+          // Logging update
+          log[h] = true;
+          o[k] = helpers.shallowMerge(o[k], v);
+        }
+        else if (opts.shiftReferences &&
+                 ('$push' in (spec[k] || {}) ||
+                  '$unshift' in (spec[k] || {}))) {
+          if ('$push' in (spec[k] || {})) {
+            v = spec[k].$push;
+
+            if (!type.Array(o[k]))
+              throw makeError(path.concat(k), 'using command $push to a non array');
+            o[k] = o[k].concat(v);
+          }
+          if ('$unshift' in (spec[k] || {})) {
+            v = spec[k].$unshift;
+
+            if (!type.Array(o[k]))
+              throw makeError(path.concat(k), 'using command $unshift to a non array');
+            o[k] = (v instanceof Array ? v : [v]).concat(o[k]);
+          }
+
+          // Logging update
+          log[h] = true;
+        }
+        else {
+
+          // If nested object does not exist, we create it
+          if (typeof o[k] === 'undefined')
+            o[k] = {};
+
+          // Shifting reference
+          if (opts.shiftReferences)
+            o[k] = helpers.shallowClone(o[k]);
+
+          // Recur
+          mutator(
+            o[k],
+            spec[k],
+            path.concat(k)
+          );
+        }
+      }
+    }
+  })(target, spec);
+
+  return Object.keys(log).map(function(hash) {
+    return hash.split('λ');
+  });
+}
+
+// Exporting
+module.exports = update;
+
+},{"./helpers.js":9,"./type.js":12}]},{},[2])(2)
+});
