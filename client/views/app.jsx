@@ -3,31 +3,34 @@
 define(function(require, exports, module) {
   var Tracks = require("views/tracks").TrackList;
   var Queue  = require("views/queue").Queue;
+  var Albums = require("views/albums").Albums;
+
+  var stateTree = require("flux/state");
+  var Dispatcher = require("flux/dispatcher");
+  var dispatcherMixin = Dispatcher.mixin(stateTree);
 
   var App = React.createClass({
-    getInitialState: function() {
-      return {currentPanel: 0};
-    },
+    mixins: [stateTree.mixin, dispatcherMixin],
+    cursor: ['panel'],
 
-    togglePanel: function(event) {
-      event.preventDefault();
-      this.setState({
-        currentPanel: (this.state.currentPanel + 1) % 2
-      });
-    },
-
-    current: function() {
-      return this.state.currentPanel;
+    togglePanel: function() {
+      this.actions.togglePanel();
     },
 
     render: function() {
+      var panel = ({
+        'albums': Albums,
+        'tracks': Tracks,
+        'queue':  Queue
+      })[this.cursor.get()];
+
       var className = React.addons.classSet({
-        'fa': true,
-        'fa-3x': true,
-        'fa-play': (this.state.currentPanel == 0),
-        'fa-list': (this.state.currentPanel == 1)
+        'fa':         true,
+        'fa-3x':      true,
+        'fa-list-ul': (panel === Albums),
+        'fa-play':    (panel === Tracks),
+        'fa-th-list': (panel === Queue)
       });
-      var title = (this.state.currentPanel == 0) ? "Tracks" : "Queue";
 
       return (
         <section role="region">
@@ -36,9 +39,10 @@ define(function(require, exports, module) {
               <a href="#" className={className} onClick={this.togglePanel}>
               </a>
             </menu>
-            <h1>{title}</h1>
+            <h1>{panel.title}</h1>
           </header>
-          <Panels current={this.current}>
+          <Panels current={panel}>
+            <Albums/>
             <Tracks/>
             <Queue/>
           </Panels>
@@ -51,8 +55,8 @@ define(function(require, exports, module) {
     render: function() {
       return (
         <article className="scrollable header">{
-          React.Children.map(this.props.children, function(panel, i) {
-            panel.props.active = (i === this.props.current());
+          React.Children.map(this.props.children, function(panel) {
+            panel.props.active = (panel.type === this.props.current.type);
             return panel;
           }.bind(this))
         }</article>

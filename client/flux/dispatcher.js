@@ -215,6 +215,19 @@ define(function(require, exports, module) {
             db.tracks.bulkDocs(library.tracks)
           ]);
         });
+    },
+
+    togglePanel: function() {
+      var panel = this.state.get('panel');
+
+      if (panel === "albums")
+        this.state.set('panel', "tracks");
+      if (panel === "tracks")
+        this.state.set('panel', "queue");
+      if (panel === "queue")
+        this.state.set('panel', "albums");
+
+      this.state.commit();
     }
   };
 

@@ -51,6 +51,10 @@ define(function(require, exports, module) {
     mixins: [stateTree.mixin],
     cursor: ["tracks"],
 
+    statics : {
+      title: "Tracks"
+    },
+
     render: function() {
       var tracks = this.cursor.get().toArray();
       var className = React.addons.classSet({

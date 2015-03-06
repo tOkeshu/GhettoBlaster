@@ -102,6 +102,10 @@ define(function(require, exports, module) {
     mixins: [stateTree.mixin, dispatcherMixin],
     cursor: ['queue'],
 
+    statics: {
+      title: "Queue"
+    },
+
     render: function() {
       var tracks = this.cursor.get('tracks').toArray();
       var className = React.addons.classSet({

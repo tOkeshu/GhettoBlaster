@@ -3,6 +3,7 @@ define(function(require, exports, module) {
   // var Baobab = require("vendor/baobab");
 
   var stateTree = new Baobab({
+    panel: 'albums',
     tracks: Immutable.Set(),
     albums: Immutable.Set(),
     queue: {
