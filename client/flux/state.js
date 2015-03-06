@@ -4,6 +4,7 @@ define(function(require, exports, module) {
 
   var stateTree = new Baobab({
     tracks: Immutable.Set(),
+    albums: Immutable.Set(),
     queue: {
       index:  null,
       tracks: Immutable.List()
@@ -14,11 +15,6 @@ define(function(require, exports, module) {
       progress: 0
     }
   });
-
-  stateTree.on('update', function() {
-    // console.log("here", stateTree.get());
-  });
-
 
   return stateTree;
 });
