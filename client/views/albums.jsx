@@ -62,15 +62,16 @@ define(function(require, exports, module) {
   });
 
   var Albums = React.createClass({
-    mixins: [stateTree.mixin],
+    mixins: [stateTree.mixin, dispatcherMixin],
     cursor: ["albums"],
 
     statics: {
       title: "Albums"
     },
 
-    switchToAlbum: function(album) {
-      console.log("switchToAlbum", album.name);
+    switchToAlbum: function(album, event) {
+      event.preventDefault();
+      this.actions.switchToAlbum(album);
     },
 
     renderAlbum: function(album) {

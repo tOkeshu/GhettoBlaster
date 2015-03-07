@@ -191,7 +191,15 @@ define(function(require, exports, module) {
       if (panel === "queue")
         this.state.set('panel', "albums");
 
+      if (panel === "album")
+        this.state.set('panel', "queue");
+
       this.state.commit();
+    },
+
+    switchToAlbum: function(album) {
+      this.state.set('panel', 'album');
+      this.state.set('album',  album);
     }
   };
 

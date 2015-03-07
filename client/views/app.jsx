@@ -4,6 +4,7 @@ define(function(require, exports, module) {
   var Tracks = require("views/tracks").TrackList;
   var Queue  = require("views/queue").Queue;
   var Albums = require("views/albums").Albums;
+  var Album  = require("views/albums").Album;
 
   var stateTree = require("flux/state");
   var Dispatcher = require("flux/dispatcher");
@@ -21,6 +22,7 @@ define(function(require, exports, module) {
       var panel = ({
         'albums': Albums,
         'tracks': Tracks,
+        'album':  Album,
         'queue':  Queue
       })[this.cursor.get()];
 
@@ -45,6 +47,8 @@ define(function(require, exports, module) {
             <Albums/>
             <Tracks/>
             <Queue/>
+
+            <Album/>
           </Panels>
         </section>
       );
