@@ -153,56 +153,19 @@ define(function(require, exports, module) {
 
           return library;
         })
-      // create all artists
-        .then(function(library) {
-          return Promise.all(library.albums.reduce(function(artists, album) {
-            var albums = artists.get(album.artist) || [];
-            albums.push(album.id);
-            return artists.set(album.artist, albums);
-          }, Immutable.Map()).map(function(albums, name) {
-            return db.artists.query(function(doc) {
-              if (doc.name === name)
-                emit(doc);
-            }).then(function(result) {
-              var artist;
-
-              if (result.rows.length === 0)
-                artist = new Artist({id: Artist.id(), name: name});
-              else
-                artist = new Artist(result.rows[0]);
-
-              artist.albums = artist.albums.concat(albums);
-              return artist;
-            });
-          }).toArray()).then(function(artists) {
-            library.artists = artists;
-            return library;
-          });
-        })
         .then(function(library) {
           var tracks  = library.tracks;
           var albums  = library.albums;
-          var artists = library.artists;
-
-          albums = albums.reduce(function(albums, album) {
-            albums[album.id] = album;
-            return albums;
-          }, {});
 
           tracks = tracks.reduce(function(tracks, track) {
             tracks[track.id] = track;
             return tracks;
           }, {});
 
-          artists.forEach(function(artist) {
-            artist.albums.forEach(function(albumId) {
-              var album = albums[albumId];
-              album.artistId = artist.id;
-              album.tracks.forEach(function(trackId) {
-                var track = tracks[trackId];
-                track.artistId = artist.id;
-                track.albumId  = album.id;
-              });
+          albums.forEach(function(album) {
+            album.tracks.forEach(function(trackId) {
+              var track = tracks[trackId];
+              track.albumId  = album.id;
             });
           });
 
