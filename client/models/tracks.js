@@ -7,6 +7,7 @@ define(function(require, exports, module) {
     this.title  = options.title;
     this.album  = options.album;
     this.artist = options.artist;
+    this.track  = options.track;
     this.data   = options.data;
     this.hash   = options.hash;
 
