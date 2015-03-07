@@ -6,7 +6,7 @@ define(function(require, exports, module) {
     this._id    = options.id || options._id;
     this.name   = options.name;
     this.artist = options.artist;
-    this.tracks = [];
+    this.tracks = options.tracks || [];
 
     this.artistId = options.artistId || null;
   }
