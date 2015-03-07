@@ -12,6 +12,14 @@ define(function(require, exports, module) {
   }
 
   Album.id = uuid;
+  Album.getTracks = function(ids, tracks) {
+    ids = Immutable.Set(ids);
+    return tracks.filter(function(track) {
+      return ids.has(track.id);
+    }).sort(function(trackA, trackB) {
+      return trackA.track > trackB.track;
+    }).toArray();
+  };
 
   Album.prototype = {
   };
