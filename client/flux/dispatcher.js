@@ -126,6 +126,7 @@ define(function(require, exports, module) {
             title:  tags.title,
             album:  tags.album,
             artist: tags.artist,
+            track:  tags.track,
             data:   blob,
             hash:   hash
           });
