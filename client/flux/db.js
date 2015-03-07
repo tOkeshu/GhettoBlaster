@@ -47,5 +47,15 @@ define(function(require, exports, module) {
       .on('change', onChange("albums", Album)).on('error', error);
   });
 
+  window.dropdb = function() {
+    Promise.all([
+      db.artists.destroy(),
+      db.albums.destroy(),
+      db.tracks.destroy()
+    ]).then(function() {
+      console.log("done");
+    }).catch(console.error.bind(console));
+  };
+
   return db;
 });
