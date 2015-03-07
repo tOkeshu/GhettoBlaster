@@ -23,6 +23,10 @@ define(function(require, exports, module) {
       }
     },
 
+    showNumber: function() {
+      return (this.props.index + 1) + " · ";
+    },
+
     render: function() {
       var currentIndex = this.cursors.queue.get('index');
       var track        = this.props.track;
@@ -34,7 +38,7 @@ define(function(require, exports, module) {
       return (
         <li className={className}>
           <a href="#" onClick={this.togglePlay}>
-            <p>{track.title}</p>
+            <p>{this.showNumber()}{track.title}</p>
           </a>
         </li>
       );
