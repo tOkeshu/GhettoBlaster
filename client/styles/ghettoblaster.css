@@ -1,24 +1,121 @@
+html {
+    font-size: 62.5%;
+    height: 100%;
+}
+
 body {
+  overflow: hidden;
   margin: 0px;
   padding: 0px;
   font-family: 'Fira Sans';
+  color: #333;
+  height: 100%;
 }
 
-header [type="toolbar"] a {
-    color: #ffffff !important;
+a {
+    text-decoration: none;
 }
 
-.panel.current {
-    animation: 0.4s ease 0s normal forwards 1 running rightToCurrent;
-    display: block;
+body > article {
+  height: 100%;
 }
 
 .panel {
     display: none;
+    height: 100%;
+}
+
+.panel.active {
+    display: flex;
+    flex-direction: column;
+}
+
+.panel > header {
+    background-color: #5244AB;
+    color: #FFF;
+    display: flex;
+}
+
+.panel > header > h1 {
+    font-size: 2.3rem;
+    line-height: 5rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-weight: 300;
+    font-style: italic;
+    text-align: center;
+
+    margin: 0px;
+    overflow: hidden;
+    flex: 1 0 auto;
+}
+
+.panel > header > a {
+    min-width: 5rem;
+    font-size: 1.5rem;
+    line-height: 5rem;
+    text-align: center;
+    color: #FFF;
+}
+
+.panel > header > a:hover {
+    background-color: rgba(0, 0, 0, 0.07);
+}
+
+.panel .content {
+    padding: 0px 1.5rem;
+    height: 100%;
+}
+
+.panel > ul {
+    list-style: outside none none;
+    margin: 0px;
+    padding: 0px;
+    overflow: auto;
+    height: 100%;
+}
+
+.panel > ul > li {
+    border-bottom: 0.1rem solid #E7E7E7;
+}
+
+.panel > ul > li a {
+    display: flex;
+    min-height: 6rem;
+    flex-direction: column;
+}
+
+.panel > ul > li p {
+    display: flex;
+    align-items: center;
+    align-content: center;
+    flex: 1 0 2.2rem;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border: medium none;
+    margin: 0px;
+
+    font-size: 1.5rem;
+    color: #858585;
+}
+
+.panel > ul > li p:first-of-type {
+    font-size: 1.8rem;
+    padding: 1rem 0px 0px;
+    color: #333;
+}
+.panel > ul > li p:first-of-type:last-of-type {
+    padding: 0px;
 }
 
 .track.playing p {
     color: #5244AB !important;
+}
+
+.importer a {
+    align-items: center;
 }
 
 .importer a p {
@@ -27,36 +124,63 @@ header [type="toolbar"] a {
     text-align: center;
 }
 
-.player {
-    position: absolute;
-    bottom: 0px;
-    left: 0px;
-}
-
 .player button {
     color: #333333 !important;
 }
 
 .progress {
-    position: absolute;
-    bottom: 45px;
-    display: block;
     width: 100%;
     height: 5px;
     background-color: #999;
-    left: 0px;
 }
 
 .progress .bar {
-    position: absolute;
-    display: block;
     width: 50%;
     height: 5px;
     background-color: #5244AB;
-    left: 0px;
     transition: width 0.6s ease 0s;
 }
 
 /* h #6E5BAA */
 /* b #5244AB */
+
+.player {
+  display: flex;
+  box-sizing: border-box;
+  height: 45px;
+  width: 100%;
+  background: #fff;
+  border-top: 1px solid #eee;
+}
+
+.player button,
+.player a {
+  position: relative;
+  flex: 1;
+  border: none;
+  border-left: 1px solid #e5e5e5;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  color: #919191;
+  border-radius: 0;
+  height: 100%;
+}
+
+.player button:first-child,
+.player a:first-child {
+  border-left: none;
+}
+
+.player button:active,
+.player a:active {
+  color: #fff;
+  background-color: #b2f2ff;
+}
+
+.player [data-icon] {
+  font-size: 0;
+}
 

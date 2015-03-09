@@ -7,6 +7,9 @@ define(function(require, exports, module) {
   var Dispatcher = require("flux/dispatcher");
   var dispatcherMixin = Dispatcher.mixin(stateTree);
 
+  var Header = require("views/commons").Header;
+  var Importer = require("views/commons").Importer;
+
   var Track = React.createClass({
     mixins: [dispatcherMixin],
 
@@ -14,15 +17,13 @@ define(function(require, exports, module) {
       this.actions.queue.add(this.props.track);
     },
 
-    showNumber: function() {
-      return this.props.track.track + " · ";
-    },
-
     render: function() {
+      var track = this.props.track;
+
       return (
         <li className="track">
           <a href="#" onClick={this.addToQueue}>
-            <p>{this.showNumber()}{this.props.track.title}</p>
+            <p>{`${track.track} · ${track.title}`}</p>
           </a>
         </li>
       );
@@ -31,29 +32,35 @@ define(function(require, exports, module) {
 
   var Album = React.createClass({
     mixins: [stateTree.mixin, dispatcherMixin],
-    cursor: ['album'],
+    cursors: {
+      panel: ['panel'],
+      album: ['album']
+    },
 
     statics: {
       title: "Album"
     },
 
     render: function() {
-      var album = this.cursor.get();
+      var album  = this.cursors.album.get();
+      var active = this.cursors.panel.get() === 'album';
+
       if (!album)
         return null;
 
       var className = React.addons.classSet({
         panel: true,
-        current: this.props.active
+        active: active
       });
 
       var tracks = AlbumModel.getTracks(album.tracks, stateTree.get('tracks'));
 
       return (
-        <section className={className} data-type="list" data-position="left">
-          <ul>{
+        <section className={className}>
+          <Header title={album.name}/>
+          <ul className="content">{
             tracks.map(function(track) {
-              return <Track track={track} num={true}/>;
+              return <Track track={track}/>;
             }.bind(this))
           }</ul>
         </section>
@@ -63,7 +70,10 @@ define(function(require, exports, module) {
 
   var Albums = React.createClass({
     mixins: [stateTree.mixin, dispatcherMixin],
-    cursor: ["albums"],
+    cursors: {
+      panel:  ["panel"],
+      albums: ["albums"]
+    },
 
     statics: {
       title: "Albums"
@@ -79,21 +89,26 @@ define(function(require, exports, module) {
         <li className="album">
           <a href="#" onClick={this.switchToAlbum.bind(this, album)}>
             <p>{album.name}</p>
+            <p>{album.artist}</p>
           </a>
         </li>
       );
     },
 
     render: function() {
-      var albums = this.cursor.get().toArray();
+      var albums = this.cursors.albums.get().toArray();
+      var active = this.cursors.panel.get() === 'albums';
+
       var className = React.addons.classSet({
         panel: true,
-        current: this.props.active
+        active: active
       });
 
       return (
-        <section className={className} data-type="list" data-position="left">
-          <ul>
+        <section className={className}>
+          <Header title="Albums"/>
+          <ul className="content">
+            <Importer/>
             {albums.map(this.renderAlbum)}
           </ul>
         </section>

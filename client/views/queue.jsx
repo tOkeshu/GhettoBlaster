@@ -5,6 +5,8 @@ define(function(require, exports, module) {
   var Dispatcher = require("flux/dispatcher");
   var dispatcherMixin = Dispatcher.mixin(stateTree);
 
+  var Header = require("views/commons").Header;
+
   var Track = React.createClass({
     mixins: [stateTree.mixin, dispatcherMixin],
     cursors: {
@@ -23,10 +25,6 @@ define(function(require, exports, module) {
       }
     },
 
-    showNumber: function() {
-      return (this.props.index + 1) + " · ";
-    },
-
     render: function() {
       var currentIndex = this.cursors.queue.get('index');
       var track        = this.props.track;
@@ -38,7 +36,7 @@ define(function(require, exports, module) {
       return (
         <li className={className}>
           <a href="#" onClick={this.togglePlay}>
-            <p>{this.showNumber()}{track.title}</p>
+            <p>{`${this.props.index + 1} · ${track.title}`}</p>
           </a>
         </li>
       );
@@ -72,7 +70,7 @@ define(function(require, exports, module) {
       var playingIcon = this.cursor.get('playing') ? "fa-pause" : "fa-play";
 
       return (
-        <div role="toolbar" className="player">
+        <div className="player">
           <button onClick={this.previous}>
             <span className="fa fa-3x fa-backward"></span>
           </button>
@@ -104,23 +102,28 @@ define(function(require, exports, module) {
 
   var Queue = React.createClass({
     mixins: [stateTree.mixin, dispatcherMixin],
-    cursor: ['queue'],
+    cursors: {
+      panel: ['panel'],
+      queue: ['queue']
+    },
 
     statics: {
       title: "Queue"
     },
 
     render: function() {
-      var tracks = this.cursor.get('tracks').toArray();
+      var tracks = this.cursors.queue.get('tracks').toArray();
+      var active = this.cursors.panel.get() === 'queue';
+
       var className = React.addons.classSet({
-        queue: true,
         panel: true,
-        current: this.props.active
+        active: active
       });
 
       return (
-        <section className={className} data-type="list" data-position="right">
-          <ul>
+        <section className={className}>
+          <Header title="Queue"/>
+          <ul className="content">
             {tracks.map(function(track, index) {
               return <Track track={track} index={index}/>;
             }.bind(this))}
