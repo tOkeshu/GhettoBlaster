@@ -4,7 +4,7 @@
   });
 
   require(['views/app'], function(App) {
-    React.renderComponent(App(), document.querySelector('body'));
+    React.render(React.createElement(App), document.querySelector('body'));
   });
 }());
 
