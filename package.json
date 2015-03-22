@@ -11,6 +11,7 @@
     "smoke-signals": "git://github.com/tOkeshu/smoke-signals.git#master"
   },
   "devDependencies": {
-    "gulp-react": "^1.0.2"
+    "gulp": "3.8.x",
+    "gulp-react": "3.0.x"
   }
 }
