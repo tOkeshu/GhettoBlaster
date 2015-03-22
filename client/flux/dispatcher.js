@@ -92,9 +92,12 @@ define(function(require, exports, module) {
   }
 
   QueueDispatcher.prototype = {
-    add: function(track) {
-      var tracks = this.state.select('queue', 'tracks');
-      tracks.edit(tracks.get().push(track));
+    add: function(tracks) {
+      if (!tracks instanceof Array)
+        tracks = [tracks];
+
+      var queue = this.state.select('queue', 'tracks');
+      queue.edit(queue.get().concat(tracks));
     }
   };
 

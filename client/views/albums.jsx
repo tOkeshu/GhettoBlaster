@@ -41,6 +41,12 @@ define(function(require, exports, module) {
       title: "Album"
     },
 
+    addToQueue: function() {
+      var album  = this.cursors.album.get();
+      var tracks = AlbumModel.getTracks(album.tracks, stateTree.get('tracks'));
+      this.actions.queue.add(tracks);
+    },
+
     render: function() {
       var album  = this.cursors.album.get();
       var active = this.cursors.panel.get() === 'album';
@@ -57,12 +63,20 @@ define(function(require, exports, module) {
 
       return (
         <section className={className}>
-          <Header title={album.name}/>
-          <ul className="content">{
-            tracks.map(function(track) {
-              return <Track track={track}/>;
-            }.bind(this))
-          }</ul>
+          <Header title="Album"/>
+          <ul className="content">
+            <li className="album-tracks">
+              <a href="#" onClick={this.addToQueue}>
+                <p>{album.name}</p>
+                <p>{`${tracks.length} tracks`}</p>
+              </a>
+            </li>
+            {
+              tracks.map(function(track) {
+                return <Track track={track}/>;
+              }.bind(this))
+            }
+          </ul>
         </section>
       );
     }

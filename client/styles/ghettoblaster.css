@@ -124,6 +124,17 @@ body > article {
     text-align: center;
 }
 
+.album-tracks a {
+    align-items: center;
+}
+
+.album-tracks a p {
+    /* color: #999999 !important; */
+    font-style: italic;
+    text-align: center;
+}
+
+
 .player button {
     color: #333333 !important;
 }
