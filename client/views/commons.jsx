@@ -12,18 +12,20 @@ define(function(require, exports, module) {
       this.actions.togglePanel();
     },
 
-    renderButton: function() {
-      var className = "fa fa-3x fa-th-list";
-      return (
-        <a href="#" className={className} onClick={this.togglePanel}></a>
-      );
+    switchToQueue: function(event) {
+      event.preventDefault();
+      this.actions.switchToQueue();
     },
 
     render: function() {
+      var queueClass = "fa fa-2x fa-music";
+      var menuClass  = "fa fa-2x fa-bars";
+
       return (
         <header>
           <h1>{this.props.title}</h1>
-          {this.renderButton()}
+          <a href="#" className={queueClass} onClick={this.switchToQueue}></a>
+          <a href="#" className={menuClass} onClick={this.togglePanel}></a>
         </header>
       );
     }
