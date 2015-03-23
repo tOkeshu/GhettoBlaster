@@ -115,10 +115,12 @@ body > article {
     color: #5244AB !important;
 }
 
+.clear-queue a,
 .importer a {
     align-items: center;
 }
 
+.clear-queue a p,
 .importer a p {
     color: #999999 !important;
     font-style: italic;

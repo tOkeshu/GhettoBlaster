@@ -35,6 +35,12 @@ define(function(require, exports, module) {
       this.player.set('playing', false);
     },
 
+    stop: function() {
+      this.audio.src = null;
+      this.player.set('track', null);
+      this.player.set('playing', false);
+    },
+
     previous: function() {
       var queue = this.queue.get();
 
@@ -98,6 +104,12 @@ define(function(require, exports, module) {
 
       var queue = this.state.select('queue', 'tracks');
       queue.edit(queue.get().concat(tracks));
+    },
+
+    clear: function() {
+      var queue = this.state.select('queue');
+      queue.set('tracks', Immutable.List());
+      queue.set('index', null);
     }
   };
 

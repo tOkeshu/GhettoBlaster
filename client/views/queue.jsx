@@ -111,6 +111,12 @@ define(function(require, exports, module) {
       title: "Queue"
     },
 
+    clearQueue: function(event) {
+      event.preventDefault();
+      this.actions.queue.clear();
+      this.actions.player.stop();
+    },
+
     render: function() {
       var tracks = this.cursors.queue.get('tracks').toArray();
       var active = this.cursors.panel.get() === 'queue';
@@ -127,6 +133,11 @@ define(function(require, exports, module) {
             {tracks.map(function(track, index) {
               return <Track track={track} index={index}/>;
             }.bind(this))}
+            <li className="clear-queue">
+              <a href="#" onClick={this.clearQueue}>
+                <p>Clear the queue</p>
+              </a>
+            </li>
           </ul>
           <Progress/>
           <Player/>
