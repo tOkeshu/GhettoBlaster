@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define(['models/tracks', 'models/albums'], function() {
   var Track = require("models/tracks").Track;
   var Album = require("models/albums").Album;
 
@@ -10,22 +10,55 @@ define(function(require, exports, module) {
     tracks:  new PouchDB('tracks')
   };
 
-  Promise.all([
-    db.tracks.allDocs({include_docs: true}),
-    db.albums.allDocs({include_docs: true})
-  ]).then(function(results) {
-    var tracks = results[0].rows.map(function(row) {
-      return new Track(row.doc);
+  function migrate(doc, Model) {
+    return new Promise(function(resolve) {
+      require(["flux/migrations"], resolve);
+    }).then(function(migrations) {
+      return migrations.migrate(doc, Model);
     });
-    var albums = results[1].rows.map(function(row) {
-      return new Album(row.doc);
-    });
+  }
 
-    return Promise.all([
-      stateTree.set('tracks',  Immutable.Set(tracks)),
-      stateTree.set('albums',  Immutable.Set(albums))
-    ]);
-  }).then(function() {
+  db.tracks.allDocs({include_docs: true}).then(function(results) {
+    return Promise.all(results.rows.map(function(row) {
+      var doc = row.doc;
+
+      if (doc.version < Track.version) {
+        return migrate(doc, Track).then(function(doc) {
+          return db.tracks.put(doc).then(function() {
+            return doc;
+          });
+        }).then(function(doc) {
+          return new Track(doc);
+        });
+      }
+
+      return new Track(doc);
+    }));
+  }).then(function(tracks) {
+    stateTree.set('tracks',  Immutable.Set(tracks));
+  });
+
+  db.albums.allDocs({include_docs: true}).then(function(results) {
+    return Promise.all(results.rows.map(function(row) {
+      var doc = row.doc;
+
+      if (doc.version < Album.version) {
+        return migrate(doc, Album).then(function(doc) {
+          return db.albums.put(doc).then(function() {
+            return doc;
+          });
+        }).then(function(doc) {
+          return new Album(doc);
+        });
+      }
+
+      return new Album(doc);
+    }));
+  }).then(function(albums) {
+    stateTree.set('albums',  Immutable.Set(albums));
+  });
+
+  (function listenForChanges() {
     var onChange = function(key, constructor) {
       return function(change) {
         var set = stateTree.get(key);
@@ -45,7 +78,7 @@ define(function(require, exports, module) {
       .on('change', onChange("tracks", Track)).on('error', error);
     db.albums.changes(options)
       .on('change', onChange("albums", Album)).on('error', error);
-  });
+  }());
 
   window.dropdb = function() {
     Promise.all([

@@ -2,20 +2,22 @@ define(function(require, exports, module) {
   var uuid = require("lib/uuid");
 
   function Track(options) {
-    this.id     = options.id || options._id;
-    this._id    = options.id || options._id;
-    this.title  = options.title;
-    this.album  = options.album;
-    this.artist = options.artist;
-    this.track  = options.track;
-    this.data   = options.data;
-    this.hash   = options.hash;
+    this.id      = options.id || options._id;
+    this._id     = options.id || options._id;
+    this.title   = options.title;
+    this.album   = options.album;
+    this.artist  = options.artist;
+    this.track   = options.track;
+    this.data    = options.data;
+    this.hash    = options.hash;
+    this.version = options.version;
 
     this.artistId = options.artistId || null;
     this.albumId  = options.albumId  || null;
   }
 
   Track.id = uuid;
+  Track.version = 201503232102;
 
   Track.prototype = {
     toFile: function() {

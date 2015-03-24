@@ -137,13 +137,14 @@ define(function(require, exports, module) {
           var tags = parser.parse(new Uint8Array(blob));
 
           return new Track({
-            id:     Track.id(),
-            title:  tags.title,
-            album:  tags.album,
-            artist: tags.artist,
-            track:  tags.track,
-            data:   blob,
-            hash:   hash
+            id:      Track.id(),
+            title:   tags.title,
+            album:   tags.album,
+            artist:  tags.artist,
+            track:   tags.track,
+            data:    blob,
+            hash:    hash,
+            version: Track.version
           });
         }.bind(this));
       }.bind(this)))
@@ -159,7 +160,8 @@ define(function(require, exports, module) {
             var album = albums.get(track.album) || new Album({
               id: Album.id(),
               name: track.album,
-              artist: track.artist
+              artist: track.artist,
+              version: Album.version
             });
 
             album.tracks.push(track.id);
