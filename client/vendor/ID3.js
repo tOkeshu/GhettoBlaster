@@ -1,7 +1,8 @@
 var ID3 = (function() {
-  ID3 = {};
+  var ID3 = {};
 
-  var textDecoder = new TextDecoder("utf-8");
+  var latin1 = new TextDecoder("latin1", {fatal: true});
+  var utf16  = new TextDecoder("utf-16", {fatal: true});
 
   function rmPadding(tag) {
     var index = tag.indexOf('\u0000');
@@ -27,20 +28,20 @@ var ID3 = (function() {
       };
       view = view.subarray(view.byteLength - 128 + 3);
 
-      var title = textDecoder.decode(view.subarray(0, 30));
+      var title = latin1.decode(view.subarray(0, 30));
       tags.title = rmPadding(title);
 
-      var artist = textDecoder.decode(view.subarray(30, 60));
+      var artist = latin1.decode(view.subarray(30, 60));
       tags.artist = rmPadding(artist);
 
-      var album = textDecoder.decode(view.subarray(60, 90));
+      var album = latin1.decode(view.subarray(60, 90));
       tags.album = rmPadding(album);
 
-      var year = textDecoder.decode(view.subarray(90, 94));
+      var year = latin1.decode(view.subarray(90, 94));
       tags.year = rmPadding(year);
 
       var comment =
-        textDecoder.decode(view.subarray(94, 124));
+        latin1.decode(view.subarray(94, 124));
       tags.comment = rmPadding(comment);
 
       if (view[122] === 0)
@@ -209,11 +210,15 @@ var ID3 = (function() {
 
   ID3v2Parser.decoders = {
     'string': function(description) {
-      return textDecoder.decode(description);
+      var isUnicode = description[0] === 1;
+      var decoder   = (isUnicode) ? utf16 : latin1;
+
+      return decoder.decode(description.subarray(1));
     },
 
     'integer': function(description) {
-      return parseInt(textDecoder.decode(description), 10);
+      description = ID3v2Parser.decoders.string(description);
+      return parseInt(description, 10);
     }
   }
 
@@ -250,8 +255,7 @@ var ID3 = (function() {
       id = view.subarray(0, 4);
       size = new DataView(view.buffer, view.byteOffset + 4, 4);
       size = size.getUint32(0);
-      // XXX: here we skip the encoding byte
-      description = view.subarray(10 + 1, 10 + size);
+      description = view.subarray(10, 10 + size);
 
       return {id: id, description: description, size: size};
     },
@@ -262,7 +266,7 @@ var ID3 = (function() {
 
       var frames = this._parseFrames(view.subarray(10, 10 + tagSize));
       var tags = frames.reduce(function(tags, frame) {
-        var id  = textDecoder.decode(frame.id);
+        var id  = latin1.decode(frame.id);
         var tag = ID3v2Parser.tags[id];
         var decode;
 
