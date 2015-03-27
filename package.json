@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "gulp": "3.8.x",
+    "gulp-util": "3.0.x",
     "gulp-react": "3.0.x"
   }
 }
