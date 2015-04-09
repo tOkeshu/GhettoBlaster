@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define(function(require, exports, module) {
   var AlbumModel = require("models/albums").Album;
 

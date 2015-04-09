@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 define(function(require, exports, module) {
   var stateTree = require("flux/state");
   var Dispatcher = require("flux/dispatcher");
